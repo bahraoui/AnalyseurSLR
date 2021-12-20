@@ -12,7 +12,7 @@ all: $(PRECOMP)
 	@if [ -e $(EXE) ]; then echo 'Compilation effectue\nlancement : ./$(EXE)'; fi
 
 %.o: %.c $(DEPS)
-	$(CC) -c -o $@ $<
+	@$(CC) -c -o $@ $<
 
 clean:
 	rm $(FOLDER)/*.o
