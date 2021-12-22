@@ -7,7 +7,7 @@ EXE=LRanalyzer
 DEPS=$(FOLDER)/LRGrammar.h $(FOLDER)/read_file.h
 PRECOMP=$(FOLDER)/LRGrammar.o $(FOLDER)/read_file.o
 FILE_TEST=assets/toto
-WORD_TEST="aa"
+WORD_TEST="ab"
 
 all: $(PRECOMP)
 	@$(CC) $(OPT) $(MAIN) $(PRECOMP) -o $(EXE)
