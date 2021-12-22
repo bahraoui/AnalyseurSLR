@@ -24,6 +24,12 @@ int main(int argc, char const *argv[])
         exit(EXIT_FAILURE);
     }
 
+    /*##########################
+     * 
+     * FIN de Verification du bon nombre d'arguments [Bon nombre = 2]
+     * 
+    ##########################*/
+
     // Verification du fichier en entree [Premier argument]
 
     char *fichier = (char *)malloc(strlen(argv[1]) + 1);
@@ -46,6 +52,12 @@ int main(int argc, char const *argv[])
         exit(EXIT_FAILURE);
     }
 
+    /*##########################
+     * 
+     * FIN de Verification du fichier
+     * 
+    ##########################*/
+
     // Lecture du mot en entree [Second Argument] :
     printf("Validation du mot en cours ...\r");
     char *mot = (char *)malloc(strlen(argv[2]) + 1);
@@ -57,23 +69,61 @@ int main(int argc, char const *argv[])
 
     /*##########################
      * 
-     * FIN de Verification du bon nombre d'arguments [Bon nombre = 2]
+     * FIN de Verification du mot
      * 
     ##########################*/
 
     /******
-    * oui
+    * debut d'algo
     ******/
-    printf("Flot | Pile\n");
     char c1 = mot[0];
     char* flot = (char*)calloc(strlen(mot),sizeof(char));
-    char* pile = (char*)calloc(strlen(mot)*2,sizeof(char));
-
+    char* pile = (char*)calloc(strlen(mot)*4,sizeof(char));
+    pile[0]='0';
+    printf("\tFlot\t|    Pile\n----------------------------------------\n");
+    printf("\t%s\t|    %s\n",mot,pile);
+    signed char transMot = fichierLu.t.trans[256*0+mot[0]];
+    char pileSize=1;
+    char pileBuffer[3];
+    pileBuffer[2]='\0';
+    // dans le cas d'un decalage
+    if (transMot>0) 
+    {
+        pileBuffer[0]=mot[0];
+        pileBuffer[1]=transMot+'0';
+        strcat(pile,pileBuffer);
+        pileSize+=2;
+        memmove(mot,mot+1,strlen(mot)); // enleve le 1er caracatere de mot
+        printf("d%d\t%s\t|    ",transMot,mot); // afficher
+        printf("%s\n",pile);
+    }
+    // dans le cas de fin de mot et d'acceptation
+    else if (transMot==-127){
+        printf("\t\taccept");
+    }
+    // dans le cas d'une reduction
+    else if (transMot<0) {
+        printf("r%d\t%s\t|    ",-transMot,mot);
+    } 
+    // dans le cas ou le mot n'est pas accepte (ex: "aa" avec le fichier toto)
+    else if (transMot==0)
+    {
+        fprintf(stderr,"ERREUR - mot non accepte");
+        exit(EXIT_FAILURE);
+    }
+    
+    
+    
+    
+    /*
     for (size_t i = 0; i != fichierLu.t.nblines; i++)
     {
-    printf("fichierLu.t.trans : %d\n",fichierLu.t.trans[256*i]);
-    }
+    printf("fichierLu.t.trans %c : %d\n",mot[0],fichierLu.t.trans[256*i+mot[0]]);
+    }*/
 
+    printf("\n\n##############################\n\n");
+    print_table(fichierLu.t,fichierLu.G);
+    
     /*
     unsigned short taille_mot = strlen(mot);
     for (size_t i = 0; i < taille_mot; i++)
