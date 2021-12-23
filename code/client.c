@@ -146,7 +146,7 @@ int main(int argc, char const *argv[])
                  * remplacer cette regle par le non terminal
                  */
                 temp = strlen(fichierLu.G.rules[-transMot-1].rhs);
-                char *ruleModified = (char *)calloc(temp,sizeof(char)); // la regle avec S qui vaut S et non (-S)
+                char *ruleModified = (char *)calloc(temp,sizeof(char)); // pour changer les non terminaux (-S) en non terminaux (S)
                 for (j = 0; j < temp; j++)
                 {
                     ruleModified[j]=fichierLu.G.rules[-transMot-1].rhs[j];
@@ -155,26 +155,24 @@ int main(int argc, char const *argv[])
                 }
                 
                 char premierCaractereRegle = ruleModified[0];
+                // replace et replace2 correspondent aux indices de la pile ou l'expression a ete retrouvee
                 char replace=0, replace2=0;
 
                 for (j = 0; j < pileSize; j++) // parcours de la pile
                 {
                     temp2=pile[j];
-                    if (temp2>='0'&&temp2<='9')
-                        continue;
-                    else if (temp2==premierCaractereRegle){
+                    if (temp2==premierCaractereRegle){
                         replace=temp2;
-                        for (v = 0; v < temp; v++)
+                        replace2=0;
+                        for (v = 0; v != temp*2; v++)
                         {
-                            if (ruleModified[0]!=pile[v+j]) 
+                            if (ruleModified[0]!=pile[v+j]){
                                 replace2=-1;
+                                break;
+                            }
                         }
                         if (replace2==0)
-                        {
                             replace2=pile[v+j];
-                            break;
-                        }
-                        
                     }
                 }
                                 
