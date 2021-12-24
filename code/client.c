@@ -83,7 +83,7 @@ int main(int argc, char const *argv[])
     char *pile = (char *)calloc(strlen(mot) * 4, sizeof(char));
     char temp, temp2;
     char pileSize = 1;
-    char pileBuffer[strlen(mot)*8];
+    char pileBuffer[strlen(mot)];
     pileBuffer[2] = '\0';
     pile[0] = '0';
     printf("\n\n##############################\nDebut Algo SLR\n##############################\n\n\
@@ -125,12 +125,11 @@ int main(int argc, char const *argv[])
             {
                 pileBuffer[0]=fichierLu.G.rules[-transMot-1].lhs;
                 // pile[pileSize-1] correspond au dernier char de pile
-                // 
                 pileBuffer[1]=fichierLu.t.trans[256 *(pile[pileSize-1]-'0'+1)  - fichierLu.G.rules[-transMot-1].lhs]+'0'; // [int+'0'] => [int to str]
                 strcat(pile,pileBuffer);
                 pileSize+=2;
                 printf("%s\n",pile);
-                transMot = fichierLu.t.trans[256 *(pile[pileSize-1]-'0'+1)  + mot[0]];
+                transMot = fichierLu.t.trans[256 *(pile[pileSize-1]-'0')  + mot[0]];
                 isReductionDone=1;
             }
             // (perso: cas general)
@@ -143,7 +142,6 @@ int main(int argc, char const *argv[])
                  * remplacer cette regle par le non terminal
                  */
                 temp = strlen(fichierLu.G.rules[-transMot-1].rhs);
-                printf("qsdqsd%d\n",-transMot-1);
                 char *ruleModified = (char *)calloc(temp,sizeof(char)); // pour changer les non terminaux (-S) en non terminaux (S)
                 for (j = 0; j < temp; j++)
                 {
@@ -157,11 +155,10 @@ int main(int argc, char const *argv[])
                 char replace=0, replace2=0;
                 for (j = 0; j < pileSize; j++) // parcours de la pile, changer par while pile[j]!='\0'
                 {
-                    temp2=pile[j];
-                    if (temp2==premierCaractereRegle){
+                    if (pile[j]==premierCaractereRegle){
                         replace=j;
                         replace2=0;
-                        for (v = j; v < temp*2; v+=2)
+                        for (v = j; v < pile[j]*2; v+=2)
                         {
                             if (ruleModified[replace2]!=pile[v]){
                                 replace2=-1;
@@ -174,7 +171,7 @@ int main(int argc, char const *argv[])
                     }
                 }
                 //pileBuffer[0]=fichierLu.G.rules[-transMot-1].lhs;
-                //pileBuffer[1]=fichierLu.t.trans[256 *(pile[pileSize]-'0'+1)  - fichierLu.G.rules[-transMot-1].lhs]+'0';
+                //pileBuffer[1]=fichierLu.t.trans[256 *(pile[pileSize-1]-'0'+1)  - fichierLu.G.rules[-transMot-1].lhs]+'0';
                 //strcpy(pileBuffer,"Sx"); // 
                 printf(" j'ai trouve : replace1 : %d,replace2: %d:::",replace,replace2);
                                 
@@ -196,6 +193,8 @@ int main(int argc, char const *argv[])
         }
     }
 
+    free(pile);
+    free(flot);
     printf("\n\n##############################\nFin Algo SLR\n##############################\n\n");
     
     // test suppr une partie d'une chaine en gardant son debut et sa fin
