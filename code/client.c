@@ -81,7 +81,7 @@ int main(int argc, char const *argv[])
      ******/
     char *flot = (char *)calloc(strlen(mot), sizeof(char)); // plus tard : utiliser flot au lieu de mot
     char *pile = (char *)calloc(strlen(mot) * 4, sizeof(char));
-    char temp, temp2;
+    char temp;
     char pileSize = 1;
     char pileBuffer[strlen(mot)];
     pileBuffer[2] = '\0';
@@ -92,7 +92,6 @@ int main(int argc, char const *argv[])
 
     // a changer plus tard en while(1) et break si erreur (4eme if) ou accept (2nd if)
     signed char transMot = fichierLu.t.trans[256 * 0 + mot[0]]; // 1 realisation avant de rentrer dans la boucle
-    signed short isReductionDone = 0;
     for (i = 0; i < taille_mot+1; i++)
     {
         // dans le cas d'un decalage
@@ -130,7 +129,6 @@ int main(int argc, char const *argv[])
                 pileSize+=2;
                 printf("%s\n",pile);
                 transMot = fichierLu.t.trans[256 *(pile[pileSize-1]-'0')  + mot[0]];
-                isReductionDone=1;
             }
             // (perso: cas general)
             // si la regle de la grammaire produit qqch
@@ -177,7 +175,6 @@ int main(int argc, char const *argv[])
                                 
                 printf("%c wow %c\n",fichierLu.G.rules[-transMot-1].lhs,fichierLu.G.rules[-transMot-1].rhs[2]);
                 free(ruleModified);
-                isReductionDone=1;
             }
             
             
