@@ -199,13 +199,13 @@ int main(int argc, char const *argv[])
     printf("\n\n##############################\nFin Algo SLR\n##############################\n\n");
     
     // test suppr une partie d'une chaine en gardant son debut et sa fin
+    // ne fonctionne que si la partie a supprimer est plus grande que la partie a mettre/remplacer
     char* ppp = (char*)calloc(15,sizeof(char));
-    char xxx[30];
+    char* xxx = "S9";
     char* ok = "a1S2b3"; // str a remplacer
     strcpy(ppp,"0a1S2b3c4"); // str de base, objectif => 0S9c4
     printf("ppp : %s\n",ppp);
-    strcpy(xxx,"S9");
-    strncpy(&ppp[1],xxx,2);
+    strncpy(&ppp[1],xxx,strlen(xxx));
     printf("ppp : %s\n",ppp);
     strcpy(&ppp[1+strlen(xxx)],&ppp[1+strlen(ok)]);
     printf("ppp : %s\n",ppp);
