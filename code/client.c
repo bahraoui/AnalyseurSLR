@@ -68,7 +68,7 @@ int main(int argc, char const *argv[])
     printf("Validation du mot en cours ... \xE2\x9C\x94\n");
 
     // affichage des valeurs donnees en entree et verifiees :
-    printf("\nFichier : %s\nMot : %s\n\n##############################\nDebut Algo SLR\n##############################\n\n", fichier, mot);
+    printf("\nFichier : %s\nMot : %s", fichier, mot);
 
     /*##########################
      *
@@ -79,14 +79,15 @@ int main(int argc, char const *argv[])
     /******
      * debut d'algo
      ******/
-    char *flot = (char *)calloc(strlen(mot), sizeof(char));
+    char *flot = (char *)calloc(strlen(mot), sizeof(char)); // plus tard : utiliser flot au lieu de mot
     char *pile = (char *)calloc(strlen(mot) * 4, sizeof(char));
     char temp, temp2;
     char pileSize = 1;
-    char pileBuffer[3];
+    char pileBuffer[strlen(mot)*8];
     pileBuffer[2] = '\0';
     pile[0] = '0';
-    printf("\tFlot\t|    Pile\n----------------------------------------\n");
+    printf("\n\n##############################\nDebut Algo SLR\n##############################\n\n\
+    \tFlot\t|    Pile\n----------------------------------------\n");
     printf("\t%s\t|    %s\n", mot, pile);
 
     // a changer plus tard en while(1) et break si erreur (4eme if) ou accept (2nd if)
@@ -97,13 +98,8 @@ int main(int argc, char const *argv[])
         // dans le cas d'un decalage
         if (transMot > 0)
         {
-            if (isReductionDone)
-            {
-                transMot = fichierLu.t.trans[256 * transMot + mot[0]];
-                isReductionDone=0;
-            }
             pileBuffer[0] = mot[0];
-            pileBuffer[1] = transMot + '0'; // int to str
+            pileBuffer[1] = transMot + '0'; // int to str (Faire attention si plus de 10 regles)
             strcat(pile, pileBuffer);
             if (mot[0]!='\0')
             {
@@ -117,23 +113,24 @@ int main(int argc, char const *argv[])
         // dans le cas de fin de mot et d'acceptation
         else if (transMot == -127)
         {
-            printf("\t\taccept");
+            printf("\t\taccept\n");
         }
         // dans le cas d'une reduction
         else if (transMot < 0)
         {
             printf("r%d\t%s\t|    ", -transMot, mot);
-            //printf("ok %c §§§ %s ok ",fichierLu.G.rules[-transMot-1].lhs, fichierLu.G.rules[-transMot-1].rhs);
             // (perso: cas unique)
             // si la regle de la grammaire produit uniquement un caractere vide (epsylon [ex: S -> ])
             if (!strlen(fichierLu.G.rules[-transMot-1].rhs)) 
             {
                 pileBuffer[0]=fichierLu.G.rules[-transMot-1].lhs;
-                pileBuffer[1]=fichierLu.t.trans[256 *(-transMot+1)  - fichierLu.G.rules[-transMot-1].lhs]+'0'; // [int+'0'] => [int to str]
+                // pile[pileSize-1] correspond au dernier char de pile
+                // 
+                pileBuffer[1]=fichierLu.t.trans[256 *(pile[pileSize-1]-'0'+1)  - fichierLu.G.rules[-transMot-1].lhs]+'0'; // [int+'0'] => [int to str]
                 strcat(pile,pileBuffer);
                 pileSize+=2;
                 printf("%s\n",pile);
-                transMot = fichierLu.t.trans[256 * (-transMot+1)  - fichierLu.G.rules[-transMot-1].lhs];
+                transMot = fichierLu.t.trans[256 *(pile[pileSize-1]-'0'+1)  + mot[0]];
                 isReductionDone=1;
             }
             // (perso: cas general)
@@ -146,6 +143,7 @@ int main(int argc, char const *argv[])
                  * remplacer cette regle par le non terminal
                  */
                 temp = strlen(fichierLu.G.rules[-transMot-1].rhs);
+                printf("qsdqsd%d\n",-transMot-1);
                 char *ruleModified = (char *)calloc(temp,sizeof(char)); // pour changer les non terminaux (-S) en non terminaux (S)
                 for (j = 0; j < temp; j++)
                 {
@@ -157,24 +155,28 @@ int main(int argc, char const *argv[])
                 char premierCaractereRegle = ruleModified[0];
                 // replace et replace2 correspondent aux indices de la pile ou l'expression a ete retrouvee
                 char replace=0, replace2=0;
-
-                for (j = 0; j < pileSize; j++) // parcours de la pile
+                for (j = 0; j < pileSize; j++) // parcours de la pile, changer par while pile[j]!='\0'
                 {
                     temp2=pile[j];
                     if (temp2==premierCaractereRegle){
-                        replace=temp2;
+                        replace=j;
                         replace2=0;
-                        for (v = 0; v != temp*2; v++)
+                        for (v = j; v < temp*2; v+=2)
                         {
-                            if (ruleModified[0]!=pile[v+j]){
+                            if (ruleModified[replace2]!=pile[v]){
                                 replace2=-1;
                                 break;
                             }
+                            replace2++;
                         }
-                        if (replace2==0)
-                            replace2=pile[v+j];
+                        if (replace2!=-1)
+                            replace2*=2;
                     }
                 }
+                //pileBuffer[0]=fichierLu.G.rules[-transMot-1].lhs;
+                //pileBuffer[1]=fichierLu.t.trans[256 *(pile[pileSize]-'0'+1)  - fichierLu.G.rules[-transMot-1].lhs]+'0';
+                //strcpy(pileBuffer,"Sx"); // 
+                printf(" j'ai trouve : replace1 : %d,replace2: %d:::",replace,replace2);
                                 
                 printf("%c wow %c\n",fichierLu.G.rules[-transMot-1].lhs,fichierLu.G.rules[-transMot-1].rhs[2]);
                 free(ruleModified);
@@ -196,15 +198,16 @@ int main(int argc, char const *argv[])
 
     printf("\n\n##############################\nFin Algo SLR\n##############################\n\n");
     
-    // test str suppr une partie
+    // test suppr une partie d'une chaine en gardant son debut et sa fin
     char* ppp = (char*)calloc(15,sizeof(char));
     char xxx[30];
-    strcpy(ppp,"ouinon"); // str de base, objectif => ozznon [inserer zz au milieu (cas d'ecole)]
+    char* ok = "a1S2b3"; // str a remplacer
+    strcpy(ppp,"0a1S2b3c4"); // str de base, objectif => 0S9c4
     printf("ppp : %s\n",ppp);
-    strcpy(xxx,"zz");
-    strcat(xxx,&ppp[3]);
+    strcpy(xxx,"S9");
+    strncpy(&ppp[1],xxx,2);
     printf("ppp : %s\n",ppp);
-    strcpy(&ppp[1],xxx);
+    strcpy(&ppp[1+strlen(xxx)],&ppp[1+strlen(ok)]);
     printf("ppp : %s\n",ppp);
     
     //print_table(fichierLu.t, fichierLu.G);
