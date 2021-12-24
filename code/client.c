@@ -83,16 +83,15 @@ int main(int argc, char const *argv[])
     char *pile = (char *)calloc(strlen(mot) * 4, sizeof(char));
     char temp;
     char pileSize = 1;
-    char pileBuffer[strlen(mot)];
+    char pileBuffer[2];
     pileBuffer[2] = '\0';
     pile[0] = '0';
     printf("\n\n##############################\nDebut Algo SLR\n##############################\n\n\
     \tFlot\t|    Pile\n----------------------------------------\n");
     printf("\t%s\t|    %s\n", mot, pile);
 
-    // a changer plus tard en while(1) et break si erreur (4eme if) ou accept (2nd if)
     signed char transMot = fichierLu.t.trans[256 * 0 + mot[0]]; // 1 realisation avant de rentrer dans la boucle
-    for (i = 0; i < taille_mot+1; i++)
+    while(1)
     {
         // dans le cas d'un decalage
         if (transMot > 0)
@@ -113,6 +112,7 @@ int main(int argc, char const *argv[])
         else if (transMot == -127)
         {
             printf("\t\taccept\n");
+            break;
         }
         // dans le cas d'une reduction
         else if (transMot < 0)
@@ -156,7 +156,7 @@ int main(int argc, char const *argv[])
                     if (pile[j]==premierCaractereRegle){
                         replace=j;
                         replace2=0;
-                        for (v = j; v < pile[j]*2; v+=2)
+                        for (v = j; v < (temp*2)+j; v+=2)
                         {
                             if (ruleModified[replace2]!=pile[v]){
                                 replace2=-1;
@@ -171,9 +171,21 @@ int main(int argc, char const *argv[])
                 //pileBuffer[0]=fichierLu.G.rules[-transMot-1].lhs;
                 //pileBuffer[1]=fichierLu.t.trans[256 *(pile[pileSize-1]-'0'+1)  - fichierLu.G.rules[-transMot-1].lhs]+'0';
                 //strcpy(pileBuffer,"Sx"); // 
-                printf(" j'ai trouve : replace1 : %d,replace2: %d:::",replace,replace2);
-                                
-                printf("%c wow %c\n",fichierLu.G.rules[-transMot-1].lhs,fichierLu.G.rules[-transMot-1].rhs[2]);
+                if (replace2==-1)
+                {
+                    fprintf(stderr, "ERREUR - L'expression de la regle [%c -> %s] n'a pas ete reconnu dans [%s].\n",fichierLu.G.rules[-transMot-1].lhs,ruleModified,pile);
+                    exit(EXIT_FAILURE);
+                } else
+                {
+                    pileBuffer[0]=fichierLu.G.rules[-transMot-1].lhs;
+                    pileBuffer[1]=fichierLu.t.trans[256 *(pile[replace-1]-'0'+1)  - fichierLu.G.rules[-transMot-1].lhs]+'0';
+                    strncpy(&pile[replace],pileBuffer,2);
+                    strcpy(&pile[replace+2], &pile[replace+strlen(fichierLu.G.rules[-transMot-1].rhs)*2]);
+                    pileSize+=2-strlen(fichierLu.G.rules[-transMot-1].rhs)*2;
+                    transMot=fichierLu.t.trans[256 *(pile[pileSize-1]-'0') + mot[0]];
+                }
+                //printf(" j'ai trouve : replace1 : %d,replace2: %d:::",replace,replace2);
+                printf("%s\n",pile);
                 free(ruleModified);
             }
             
@@ -196,8 +208,13 @@ int main(int argc, char const *argv[])
     
     // test suppr une partie d'une chaine en gardant son debut et sa fin
     // ne fonctionne que si la partie a supprimer est plus grande que la partie a mettre/remplacer
+    // PPP = pile
+    // xxx 2 lettres a ajouter
+    // ok char a remplacer
     char* ppp = (char*)calloc(15,sizeof(char));
-    char* xxx = "S9";
+    char* xxx = (char*)calloc(15,sizeof(char));
+    strcpy(xxx,"S:\0p4");
+    strcpy(xxx,"S9");
     char* ok = "a1S2b3"; // str a remplacer
     strcpy(ppp,"0a1S2b3c4"); // str de base, objectif => 0S9c4
     printf("ppp : %s\n",ppp);
@@ -205,6 +222,7 @@ int main(int argc, char const *argv[])
     printf("ppp : %s\n",ppp);
     strcpy(&ppp[1+strlen(xxx)],&ppp[1+strlen(ok)]);
     printf("ppp : %s\n",ppp);
+    char p[5];
     
     //print_table(fichierLu.t, fichierLu.G);
 
