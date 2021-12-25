@@ -1,9 +1,10 @@
 #include "LRGrammar.h"
 #include "read_file.h"
+#define MAX_STEPS 150
 
 int main(int argc, char const *argv[])
 {
-    size_t i, j, v;
+    size_t j, v;
     /****************************
      *
      *  Verification du bon nombre d'arguments [Bon nombre = 2]
@@ -49,6 +50,7 @@ int main(int argc, char const *argv[])
     }
     else // Fichier inexistant ou impossible d'acces
     {
+        printf("Lecture du fichier en cours ... \xE2\x9D\x8C\n");
         fprintf(stderr, "Impossible d'ouvrir le fichier %s\n", fichier);
         exit(EXIT_FAILURE);
     }
@@ -80,35 +82,43 @@ int main(int argc, char const *argv[])
      * debut d'algo
      ******/
     char *flot = (char *)calloc(strlen(mot), sizeof(char)); // plus tard : utiliser flot au lieu de mot
-    char *pile = (char *)calloc(strlen(mot) * 4, sizeof(char));
+    strcpy(flot,mot);
+    char *pile = (char *)calloc(strlen(flot) * 4, sizeof(char));
     char temp;
     char pileSize = 1;
     char pileBuffer[2];
+    char* pileBufferNumbers = (char*)calloc(fichierLu.t.nblines,sizeof(char));
     pileBuffer[2] = '\0';
     pile[0] = '0';
     printf("\n\n##############################\nDebut Algo SLR\n##############################\n\n\
     \tFlot\t|    Pile\n----------------------------------------\n");
-    printf("\t%s\t|    %s\n", mot, pile);
+    printf("\t%s\t|    %s\n", flot, pile);
 
-    signed char transMot = fichierLu.t.trans[256 * 0 + mot[0]]; // 1 realisation avant de rentrer dans la boucle
+    signed char transMot = fichierLu.t.trans[256 * 0 + flot[0]]; // 1 realisation avant de rentrer dans la boucle
     while(1)
     {
         // dans le cas d'un decalage
         if (transMot > 0)
         {
-            pileBuffer[0] = mot[0];
-            pileBuffer[1] = transMot + '0'; // int to str (Faire attention si plus de 10 regles)
-            strcat(pile, pileBuffer);
-            if (mot[0]!='\0')
+            pileBuffer[0] = flot[0];
+            if (transMot<10)
             {
-                memmove(mot, mot + 1, strlen(mot)); // enleve le 1er caracatere de mot
+                pileBuffer[1] = transMot + '0'; // int to str (Faire attention si plus de 10 regles)
+            } else
+            {
+                sprintf(pileBufferNumbers,"%d",transMot);
             }
-            printf("d%d\t%s\t|    ", transMot, mot);
+            strcat(pile, pileBuffer);
+            if (flot[0]!='\0')
+            {
+                memmove(flot, flot + 1, strlen(flot)); // enleve le 1er caracatere de flot
+            }
+            printf("d%d\t%s\t|    ", transMot, flot);
             printf("%s\n", pile);
             pileSize += 2;
-            transMot = fichierLu.t.trans[256 * transMot + mot[0]];
+            transMot = fichierLu.t.trans[256 * transMot + flot[0]];
         }
-        // dans le cas de fin de mot et d'acceptation
+        // dans le cas de fin de flot et d'acceptation
         else if (transMot == -127)
         {
             printf("\t\taccept\n");
@@ -117,10 +127,10 @@ int main(int argc, char const *argv[])
         // dans le cas d'une reduction
         else if (transMot < 0)
         {
-            printf("r%d\t%s\t|    ", -transMot, mot);
+            printf("r%d\t%s\t|    ", -transMot, flot);
             // (perso: cas unique)
             // si la regle de la grammaire produit uniquement un caractere vide (epsylon [ex: S -> ])
-            if (!strlen(fichierLu.G.rules[-transMot-1].rhs)) 
+            if (!strlen((const char*)fichierLu.G.rules[-transMot-1].rhs)) 
             {
                 pileBuffer[0]=fichierLu.G.rules[-transMot-1].lhs;
                 // pile[pileSize-1] correspond au dernier char de pile
@@ -128,7 +138,7 @@ int main(int argc, char const *argv[])
                 strcat(pile,pileBuffer);
                 pileSize+=2;
                 printf("%s\n",pile);
-                transMot = fichierLu.t.trans[256 *(pile[pileSize-1]-'0')  + mot[0]];
+                transMot = fichierLu.t.trans[256 *(pile[pileSize-1]-'0')  + flot[0]];
             }
             // (perso: cas general)
             // si la regle de la grammaire produit qqch
@@ -139,7 +149,7 @@ int main(int argc, char const *argv[])
                  * reconnaitre la regle
                  * remplacer cette regle par le non terminal
                  */
-                temp = strlen(fichierLu.G.rules[-transMot-1].rhs);
+                temp = strlen((const char*)fichierLu.G.rules[-transMot-1].rhs);
                 char *ruleModified = (char *)calloc(temp,sizeof(char)); // pour changer les non terminaux (-S) en non terminaux (S)
                 for (j = 0; j < temp; j++)
                 {
@@ -180,9 +190,9 @@ int main(int argc, char const *argv[])
                     pileBuffer[0]=fichierLu.G.rules[-transMot-1].lhs;
                     pileBuffer[1]=fichierLu.t.trans[256 *(pile[replace-1]-'0'+1)  - fichierLu.G.rules[-transMot-1].lhs]+'0';
                     strncpy(&pile[replace],pileBuffer,2);
-                    strcpy(&pile[replace+2], &pile[replace+strlen(fichierLu.G.rules[-transMot-1].rhs)*2]);
-                    pileSize+=2-strlen(fichierLu.G.rules[-transMot-1].rhs)*2;
-                    transMot=fichierLu.t.trans[256 *(pile[pileSize-1]-'0') + mot[0]];
+                    strcpy(&pile[replace+2], &pile[replace+strlen((const char*)fichierLu.G.rules[-transMot-1].rhs)*2]);
+                    pileSize+=2-strlen((const char*)fichierLu.G.rules[-transMot-1].rhs)*2;
+                    transMot=fichierLu.t.trans[256 *(pile[pileSize-1]-'0') + flot[0]];
                 }
                 //printf(" j'ai trouve : replace1 : %d,replace2: %d:::",replace,replace2);
                 printf("%s\n",pile);
@@ -194,7 +204,7 @@ int main(int argc, char const *argv[])
 
             // fin ok
         }
-        // dans le cas ou le mot n'est pas accepte (ex: "aa" avec le fichier toto)
+        // dans le cas ou le flot n'est pas accepte (ex: "aa" avec le fichier toto)
         else if (transMot == 0)
         {
             fprintf(stderr, "ERREUR - mot non accepte\n");
@@ -222,7 +232,6 @@ int main(int argc, char const *argv[])
     printf("ppp : %s\n",ppp);
     strcpy(&ppp[1+strlen(xxx)],&ppp[1+strlen(ok)]);
     printf("ppp : %s\n",ppp);
-    char p[5];
     
     //print_table(fichierLu.t, fichierLu.G);
 
