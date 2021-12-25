@@ -130,7 +130,7 @@ int main(int argc, char const *argv[])
             printf("r%d\t%s\t|    ", -transMot, flot);
             // (perso: cas unique)
             // si la regle de la grammaire produit uniquement un caractere vide (epsylon [ex: S -> ])
-            if (!strlen((const char*)fichierLu.G.rules[-transMot-1].rhs)) 
+            if (!strlen(fichierLu.G.rules[-transMot-1].rhs)) 
             {
                 pileBuffer[0]=fichierLu.G.rules[-transMot-1].lhs;
                 // pile[pileSize-1] correspond au dernier char de pile
@@ -149,7 +149,7 @@ int main(int argc, char const *argv[])
                  * reconnaitre la regle
                  * remplacer cette regle par le non terminal
                  */
-                temp = strlen((const char*)fichierLu.G.rules[-transMot-1].rhs);
+                temp = strlen(fichierLu.G.rules[-transMot-1].rhs);
                 char *ruleModified = (char *)calloc(temp,sizeof(char)); // pour changer les non terminaux (-S) en non terminaux (S)
                 for (j = 0; j < temp; j++)
                 {
@@ -166,10 +166,12 @@ int main(int argc, char const *argv[])
                     if (pile[j]==premierCaractereRegle){
                         replace=j;
                         replace2=0;
+                        printf("--temp:%d,j:%d--",temp,j);
                         for (v = j; v < (temp*2)+j; v+=2)
                         {
+                            printf("--v:%d--",v);
                             if (ruleModified[replace2]!=pile[v]){
-                                replace2=-1;
+                                printf("--%c#%d--",ruleModified[replace2],v);
                                 break;
                             }
                             replace2++;
@@ -181,7 +183,7 @@ int main(int argc, char const *argv[])
                 //pileBuffer[0]=fichierLu.G.rules[-transMot-1].lhs;
                 //pileBuffer[1]=fichierLu.t.trans[256 *(pile[pileSize-1]-'0'+1)  - fichierLu.G.rules[-transMot-1].lhs]+'0';
                 //strcpy(pileBuffer,"Sx"); // 
-                if (replace2==-1)
+                if (replace2==0)
                 {
                     fprintf(stderr, "ERREUR - L'expression de la regle [%c -> %s] n'a pas ete reconnu dans [%s].\n",fichierLu.G.rules[-transMot-1].lhs,ruleModified,pile);
                     exit(EXIT_FAILURE);
@@ -190,8 +192,8 @@ int main(int argc, char const *argv[])
                     pileBuffer[0]=fichierLu.G.rules[-transMot-1].lhs;
                     pileBuffer[1]=fichierLu.t.trans[256 *(pile[replace-1]-'0'+1)  - fichierLu.G.rules[-transMot-1].lhs]+'0';
                     strncpy(&pile[replace],pileBuffer,2);
-                    strcpy(&pile[replace+2], &pile[replace+strlen((const char*)fichierLu.G.rules[-transMot-1].rhs)*2]);
-                    pileSize+=2-strlen((const char*)fichierLu.G.rules[-transMot-1].rhs)*2;
+                    strcpy(&pile[replace+2], &pile[replace+strlen(fichierLu.G.rules[-transMot-1].rhs)*2]);
+                    pileSize+=2-strlen(fichierLu.G.rules[-transMot-1].rhs)*2;
                     transMot=fichierLu.t.trans[256 *(pile[pileSize-1]-'0') + flot[0]];
                 }
                 //printf(" j'ai trouve : replace1 : %d,replace2: %d:::",replace,replace2);
