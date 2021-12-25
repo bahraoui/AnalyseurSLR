@@ -85,6 +85,7 @@ int main(int argc, char const *argv[])
     strcpy(flot,mot);
     char *pile = (char *)calloc(strlen(flot) * 4, sizeof(char));
     char temp;
+    char replace=0, replace2=0;
     char pileSize = 1;
     char pileBuffer[2];
     char* pileBufferNumbers = (char*)calloc(fichierLu.t.nblines,sizeof(char));
@@ -104,11 +105,12 @@ int main(int argc, char const *argv[])
             if (transMot<10)
             {
                 pileBuffer[1] = transMot + '0'; // int to str (Faire attention si plus de 10 regles)
+                strcat(pile, pileBuffer);
             } else
             {
                 sprintf(pileBufferNumbers,"%d",transMot);
+                strcat(pile, pileBufferNumbers);
             }
-            strcat(pile, pileBuffer);
             if (flot[0]!='\0')
             {
                 memmove(flot, flot + 1, strlen(flot)); // enleve le 1er caracatere de flot
@@ -160,34 +162,33 @@ int main(int argc, char const *argv[])
                 
                 char premierCaractereRegle = ruleModified[0];
                 // replace et replace2 correspondent aux indices de la pile ou l'expression a ete retrouvee
-                char replace=0, replace2=0;
+                replace = 0;
+                replace2=0;
                 j=0;
-                //for (j = 0; j < pileSize; j++) // parcours de la pile, changer par while pile[j]!='\0'
+                // parcours de la pile, changer par while pile[j]!='\0'
                 while(pile[j]!='\0')
                 {
-                    printf("pilesize:%d",pileSize);
                     if (pile[j]==premierCaractereRegle){
-                        replace=j;
                         replace2=0;
-                        printf("--temp:%d,j:%d--",temp,j);
                         for (v = j; v < (temp*2)+j; v+=2)
                         {
-                            printf("--v:%d--",v);
                             if (ruleModified[replace2]!=pile[v]){
-                                printf("--%c#%d--",ruleModified[replace2],v);
+                                replace2=-1;
                                 break;
                             }
                             replace2++;
                         }
-                        if (replace2!=-1)
-                            replace2*=2;
+                        if (replace2!=-1){
+                            replace=j;
+                            break;
+                        }
                     }
                     j++;
                 }
                 //pileBuffer[0]=fichierLu.G.rules[-transMot-1].lhs;
                 //pileBuffer[1]=fichierLu.t.trans[256 *(pile[pileSize-1]-'0'+1)  - fichierLu.G.rules[-transMot-1].lhs]+'0';
                 //strcpy(pileBuffer,"Sx"); // 
-                if (replace2==0)
+                if (replace2==-1)
                 {
                     fprintf(stderr, "ERREUR - L'expression de la regle [%c -> %s] n'a pas ete reconnu dans [%s].\n",fichierLu.G.rules[-transMot-1].lhs,ruleModified,pile);
                     exit(EXIT_FAILURE);
@@ -197,7 +198,9 @@ int main(int argc, char const *argv[])
                     pileBuffer[1]=fichierLu.t.trans[256 *(pile[replace-1]-'0'+1)  - fichierLu.G.rules[-transMot-1].lhs]+'0';
                     strncpy(&pile[replace],pileBuffer,2);
                     strcpy(&pile[replace+2], &pile[replace+strlen(fichierLu.G.rules[-transMot-1].rhs)*2]);
+                    //printf("-%d-",pileSize);
                     pileSize+=2-strlen(fichierLu.G.rules[-transMot-1].rhs)*2;
+                    //printf("-%d-",pileSize);
                     transMot=fichierLu.t.trans[256 *(pile[pileSize-1]-'0') + flot[0]];
                 }
                 //printf(" j'ai trouve : replace1 : %d,replace2: %d:::",replace,replace2);
@@ -213,7 +216,7 @@ int main(int argc, char const *argv[])
         // dans le cas ou le flot n'est pas accepte (ex: "aa" avec le fichier toto)
         else if (transMot == 0)
         {
-            fprintf(stderr, "ERREUR - mot non accepte\n");
+            fprintf(stderr, "ERREUR - mot non accepte-%d--%c-\n",transMot,flot[0]);
             exit(EXIT_FAILURE);
         }
     }
@@ -238,6 +241,14 @@ int main(int argc, char const *argv[])
     printf("ppp : %s\n",ppp);
     strcpy(&ppp[1+strlen(xxx)],&ppp[1+strlen(ok)]);
     printf("ppp : %s\n",ppp);
+    char* oui = (char *)calloc(4,sizeof(char));
+    char nb = 15;
+    sprintf(oui,"%d",nb);
+    printf("oui : %s\n",oui);
+    nb = 47;
+    sprintf(oui,"%d",nb);
+    printf("oui : %s\n",oui);
+
     
     //print_table(fichierLu.t, fichierLu.G);
 
