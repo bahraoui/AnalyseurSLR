@@ -161,8 +161,11 @@ int main(int argc, char const *argv[])
                 char premierCaractereRegle = ruleModified[0];
                 // replace et replace2 correspondent aux indices de la pile ou l'expression a ete retrouvee
                 char replace=0, replace2=0;
-                for (j = 0; j < pileSize; j++) // parcours de la pile, changer par while pile[j]!='\0'
+                j=0;
+                //for (j = 0; j < pileSize; j++) // parcours de la pile, changer par while pile[j]!='\0'
+                while(pile[j]!='\0')
                 {
+                    printf("pilesize:%d",pileSize);
                     if (pile[j]==premierCaractereRegle){
                         replace=j;
                         replace2=0;
@@ -179,6 +182,7 @@ int main(int argc, char const *argv[])
                         if (replace2!=-1)
                             replace2*=2;
                     }
+                    j++;
                 }
                 //pileBuffer[0]=fichierLu.G.rules[-transMot-1].lhs;
                 //pileBuffer[1]=fichierLu.t.trans[256 *(pile[pileSize-1]-'0'+1)  - fichierLu.G.rules[-transMot-1].lhs]+'0';
