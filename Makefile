@@ -10,7 +10,7 @@ FILE_TEST=assets/toto
 WORD_TEST="ab"
 
 all: $(PRECOMP)
-	@$(CC) $(OPTS) $(MAIN) $(PRECOMP) -o $(EXE)
+	@$(CC) $(MAIN) $(PRECOMP) $(OPTS) -o $(EXE)
 	@if [ -e $(EXE) ]; then echo 'Compilation effectue\nlancement : ./$(EXE)'; fi
 
 %.o: %.c $(DEPS)

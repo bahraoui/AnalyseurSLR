@@ -83,8 +83,9 @@ int main(int argc, char const *argv[])
      ******/
     char *flot = (char *)calloc(strlen(mot), sizeof(char)); // plus tard : utiliser flot au lieu de mot
     strcpy(flot,mot);
-    char *pile = (char *)calloc(strlen(flot) * 4, sizeof(char));
-    char temp;
+    char *pile = (char *)calloc(strlen(mot) * 4, sizeof(char));
+    char *arbre = (char *)calloc(strlen(mot) * 6, sizeof(char));
+    char temp, temp2;
     char replace=0, replace2=0;
     char pileSize = 1;
     char pileBuffer[2];
@@ -101,14 +102,17 @@ int main(int argc, char const *argv[])
         // dans le cas d'un decalage
         if (transMot > 0)
         {
-            pileBuffer[0] = flot[0];
             if (transMot<10)
             {
+                pileBuffer[0] = flot[0];
                 pileBuffer[1] = transMot + '0'; // int to str (Faire attention si plus de 10 regles)
-                strcat(pile, pileBuffer);
+                //strcat(pile, pileBuffer);
+                sprintf(&pile[pileSize],"%c%d",flot[0],transMot);
+                pileSize += 2;
             } else
             {
                 sprintf(pileBufferNumbers,"%d",transMot);
+                pileSize+=strlen(pileBufferNumbers);
                 strcat(pile, pileBufferNumbers);
             }
             if (flot[0]!='\0')
@@ -117,7 +121,6 @@ int main(int argc, char const *argv[])
             }
             printf("d%d\t%s\t|    ", transMot, flot);
             printf("%s\n", pile);
-            pileSize += 2;
             transMot = fichierLu.t.trans[256 * transMot + flot[0]];
         }
         // dans le cas de fin de flot et d'acceptation
@@ -136,8 +139,17 @@ int main(int argc, char const *argv[])
             {
                 pileBuffer[0]=fichierLu.G.rules[-transMot-1].lhs;
                 // pile[pileSize-1] correspond au dernier char de pile
-                pileBuffer[1]=fichierLu.t.trans[256 *(pile[pileSize-1]-'0'+1)  - fichierLu.G.rules[-transMot-1].lhs]+'0'; // [int+'0'] => [int to str]
-                strcat(pile,pileBuffer);
+                temp=pileSize-1;
+                temp2=pile[pileSize-1]-'0';
+                j=1;
+                while (pile[temp]>='0'&&pile[temp]<='9')
+                    temp--;
+                while (temp!=pileSize-1)
+                {
+                    temp2=10*temp2+pile[temp]-'0';
+                    temp++;
+                }
+                sprintf(&pile[pileSize],"%c%d",fichierLu.G.rules[-transMot-1].lhs,fichierLu.t.trans[256 *(pile[pileSize-1]-'0'+1)  - fichierLu.G.rules[-transMot-1].lhs]);
                 pileSize+=2;
                 printf("%s\n",pile);
                 transMot = fichierLu.t.trans[256 *(pile[pileSize-1]-'0')  + flot[0]];
@@ -152,60 +164,25 @@ int main(int argc, char const *argv[])
                  * remplacer cette regle par le non terminal
                  */
                 temp = strlen(fichierLu.G.rules[-transMot-1].rhs);
-                char *ruleModified = (char *)calloc(temp,sizeof(char)); // pour changer les non terminaux (-S) en non terminaux (S)
-                for (j = 0; j < temp; j++)
-                {
-                    ruleModified[j]=fichierLu.G.rules[-transMot-1].rhs[j];
-                    if (ruleModified[j]<0)
-                        ruleModified[j]=-ruleModified[j];
-                }
-                
-                char premierCaractereRegle = ruleModified[0];
-                // replace et replace2 correspondent aux indices de la pile ou l'expression a ete retrouvee
-                replace = 0;
-                replace2=0;
-                j=0;
-                // parcours de la pile, changer par while pile[j]!='\0'
-                while(pile[j]!='\0')
-                {
-                    if (pile[j]==premierCaractereRegle){
-                        replace2=0;
-                        for (v = j; v < (temp*2)+j; v+=2)
-                        {
-                            if (ruleModified[replace2]!=pile[v]){
-                                replace2=-1;
-                                break;
-                            }
-                            replace2++;
-                        }
-                        if (replace2!=-1){
-                            replace=j;
-                            break;
-                        }
-                    }
-                    j++;
-                }
-                //pileBuffer[0]=fichierLu.G.rules[-transMot-1].lhs;
-                //pileBuffer[1]=fichierLu.t.trans[256 *(pile[pileSize-1]-'0'+1)  - fichierLu.G.rules[-transMot-1].lhs]+'0';
-                //strcpy(pileBuffer,"Sx"); // 
+
                 if (replace2==-1)
                 {
+                    char *ruleModified = (char *)calloc(temp,sizeof(char)); // pour changer les non terminaux (-S) en non terminaux (S)
+                    for (j = 0; j < temp; j++)
+                    {
+                        ruleModified[j]=fichierLu.G.rules[-transMot-1].rhs[j];
+                        if (ruleModified[j]<0)
+                            ruleModified[j]=-ruleModified[j];
+                    }
                     fprintf(stderr, "ERREUR - L'expression de la regle [%c -> %s] n'a pas ete reconnu dans [%s].\n",fichierLu.G.rules[-transMot-1].lhs,ruleModified,pile);
                     exit(EXIT_FAILURE);
                 } else
                 {
-                    pileBuffer[0]=fichierLu.G.rules[-transMot-1].lhs;
-                    pileBuffer[1]=fichierLu.t.trans[256 *(pile[replace-1]-'0'+1)  - fichierLu.G.rules[-transMot-1].lhs]+'0';
-                    strncpy(&pile[replace],pileBuffer,2);
-                    strcpy(&pile[replace+2], &pile[replace+strlen(fichierLu.G.rules[-transMot-1].rhs)*2]);
-                    //printf("-%d-",pileSize);
+                    sprintf(&pile[pileSize-strlen(fichierLu.G.rules[-transMot-1].rhs)*2],"%c%d",fichierLu.G.rules[-transMot-1].lhs, fichierLu.t.trans[256 *(pile[replace-1]-'0'+1) - fichierLu.G.rules[-transMot-1].lhs]);
                     pileSize+=2-strlen(fichierLu.G.rules[-transMot-1].rhs)*2;
-                    //printf("-%d-",pileSize);
                     transMot=fichierLu.t.trans[256 *(pile[pileSize-1]-'0') + flot[0]];
                 }
-                //printf(" j'ai trouve : replace1 : %d,replace2: %d:::",replace,replace2);
                 printf("%s\n",pile);
-                free(ruleModified);
             }
             
             
@@ -232,7 +209,6 @@ int main(int argc, char const *argv[])
     // ok char a remplacer
     char* ppp = (char*)calloc(15,sizeof(char));
     char* xxx = (char*)calloc(15,sizeof(char));
-    strcpy(xxx,"S:\0p4");
     strcpy(xxx,"S9");
     char* ok = "a1S2b3"; // str a remplacer
     strcpy(ppp,"0a1S2b3c4"); // str de base, objectif => 0S9c4
@@ -241,12 +217,12 @@ int main(int argc, char const *argv[])
     printf("ppp : %s\n",ppp);
     strcpy(&ppp[1+strlen(xxx)],&ppp[1+strlen(ok)]);
     printf("ppp : %s\n",ppp);
-    char* oui = (char *)calloc(4,sizeof(char));
-    char nb = 15;
+    char* oui = (char *)calloc(100,sizeof(char));
+    long nb = 159999999;
     sprintf(oui,"%d",nb);
     printf("oui : %s\n",oui);
-    nb = 47;
-    sprintf(oui,"%d",nb);
+    nb = 16;
+    sprintf(&oui[2],"%c%d",'a',nb);
     printf("oui : %s\n",oui);
 
     
