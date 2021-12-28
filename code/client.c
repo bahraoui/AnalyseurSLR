@@ -85,7 +85,7 @@ int main(int argc, char const *argv[])
     char *flot = (char *)calloc(strlen(mot), sizeof(char)); // plus tard : utiliser flot au lieu de mot
     strcpy(flot, mot);
     char *pile = (char *)calloc(strlen(mot) * 4, sizeof(char));
-    char ruleSize, tmp, indexRule, indexNbTransition;
+    char ruleSize, tmp, indexRule, indexNbTransition, nbDigits;
     char pileSize = 1;
     pile[0] = '0';
     printf("\n\n##############################\n\tDebut Algo SLR\n##############################\n\n\
@@ -125,53 +125,33 @@ int main(int argc, char const *argv[])
         else if (transMot < 0)
         {
             printf("r%d\t%s\t|    ", -transMot, flot);
-            // (perso: cas unique)
-            // si la regle de la grammaire produit uniquement un caractere vide (epsylon [ex: S -> ])
-            if (!strlen(fichierLu.G.rules[-transMot - 1].rhs))
-            {
-                ruleSize = pileSize - 1;
-                while (pile[ruleSize] >= '0' && pile[ruleSize] <= '9')
-                    ruleSize--;
-                sscanf(&pile[ruleSize+1],"%d",&tmp);
-                sprintf(&pile[pileSize], "%c%d", fichierLu.G.rules[-transMot - 1].lhs, fichierLu.t.trans[256 * (tmp + 1) - fichierLu.G.rules[-transMot - 1].lhs]);
-                pileSize += 2;
-                printf("%s\n", pile);
-                transMot = fichierLu.t.trans[256 * (pile[pileSize - 1] - '0') + flot[0]];
-            }
-            // (perso: cas general)
-            // si la regle de la grammaire produit qqch
-            else
-            {
-                ruleSize = strlen(fichierLu.G.rules[-transMot - 1].rhs);
-                indexRule = pileSize - 1;
-                tmp = 0;
-                // indexRule correspond au premier caractere de l'expression a retrouver
-                while (tmp != ruleSize){
-                    if ('0'>=pile[indexRule] || pile[indexRule]>='9')
-                    {
-                        tmp++;
-                    }
-                    indexRule--;
-                }
-                // indexNbTransition correspond au nombre precedant l'expression retrouvee
-                indexNbTransition=indexRule;
-                while ('0'<=pile[indexNbTransition] && pile[indexNbTransition]<='9')
+            ruleSize = strlen(fichierLu.G.rules[-transMot - 1].rhs);
+            indexRule = pileSize - 1;
+            //printf("-#%d#",indexRule);
+            tmp = 0;
+            // indexRule correspond au premier caractere de l'expression a retrouver
+            while (tmp != ruleSize){
+                if ('0'>pile[indexRule] || pile[indexRule]>'9')
                 {
-                    indexNbTransition--;
+                    tmp++;
                 }
-                //printf("ok%d\n",indexNbTransition+1);
-                sscanf(&pile[indexNbTransition+1],"%d",&tmp);    
-                sprintf(&pile[indexRule+1], "%c%d", fichierLu.G.rules[-transMot - 1].lhs, fichierLu.t.trans[256 * (tmp + 1) - fichierLu.G.rules[-transMot - 1].lhs]);
-                pileSize += 2 - 2*ruleSize;
-                // digits tout ca la >10
-                tmp=fichierLu.t.trans[256 * (tmp + 1) - fichierLu.G.rules[-transMot - 1].lhs];
-                transMot = fichierLu.t.trans[256 * (tmp) + flot[0]];
-                printf("%s\n", pile);                
+                indexRule--;
             }
-
-            // ok
-
-            // fin ok
+            // indexNbTransition correspond au nombre precedant l'expression retrouvee
+            indexNbTransition=indexRule;
+            while ('0'<=pile[indexNbTransition] && pile[indexNbTransition]<='9')
+            {
+                indexNbTransition--;
+            }
+            //printf("ok%d\n",indexNbTransition+1);
+            sscanf(&pile[indexNbTransition+1],"%d",&tmp);
+            sprintf(&pile[indexRule+1], "%c%d", fichierLu.G.rules[-transMot - 1].lhs, fichierLu.t.trans[256 * (tmp + 1) - fichierLu.G.rules[-transMot - 1].lhs]);
+            nbDigits = 
+            pileSize = indexRule+2;
+            // digits tout ca la >10
+            tmp=fichierLu.t.trans[256 * (tmp + 1) - fichierLu.G.rules[-transMot - 1].lhs];
+            transMot = fichierLu.t.trans[256 * (tmp) + flot[0]];
+            printf("%s\n", pile);
         }
         // dans le cas ou le flot n'est pas accepte (ex: "aa" avec S -> aSb|ε)
         else if (transMot == 0)
