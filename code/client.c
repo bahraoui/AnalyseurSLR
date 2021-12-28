@@ -178,8 +178,8 @@ int main(int argc, char const *argv[])
                     exit(EXIT_FAILURE);
                 } else
                 {
-                    sprintf(&pile[pileSize-strlen(fichierLu.G.rules[-transMot-1].rhs)*2],"%c%d",fichierLu.G.rules[-transMot-1].lhs, fichierLu.t.trans[256 *(pile[replace-1]-'0'+1) - fichierLu.G.rules[-transMot-1].lhs]);
-                    pileSize+=2-strlen(fichierLu.G.rules[-transMot-1].rhs)*2;
+                    sprintf(&pile[pileSize-temp*2],"%c%d",fichierLu.G.rules[-transMot-1].lhs, fichierLu.t.trans[256 *(pile[pileSize-temp*2-1]-'0'+1) - fichierLu.G.rules[-transMot-1].lhs]);
+                    pileSize+=2-temp*2;
                     transMot=fichierLu.t.trans[256 *(pile[pileSize-1]-'0') + flot[0]];
                 }
                 printf("%s\n",pile);
@@ -207,6 +207,7 @@ int main(int argc, char const *argv[])
     // PPP = pile
     // xxx 2 lettres a ajouter
     // ok char a remplacer
+    //v1
     char* ppp = (char*)calloc(15,sizeof(char));
     char* xxx = (char*)calloc(15,sizeof(char));
     strcpy(xxx,"S9");
@@ -217,7 +218,8 @@ int main(int argc, char const *argv[])
     printf("ppp : %s\n",ppp);
     strcpy(&ppp[1+strlen(xxx)],&ppp[1+strlen(ok)]);
     printf("ppp : %s\n",ppp);
-    char* oui = (char *)calloc(100,sizeof(char));
+    //v2
+    char* oui = (char *)calloc(50,sizeof(char));
     long nb = 159999999;
     sprintf(oui,"%d",nb);
     printf("oui : %s\n",oui);
@@ -225,8 +227,14 @@ int main(int argc, char const *argv[])
     sprintf(&oui[2],"%c%d",'a',nb);
     printf("oui : %s\n",oui);
 
-    
-    //print_table(fichierLu.t, fichierLu.G);
+    //**//
+
+    //v1
+    char* mmm = "0a2S3b4";
+    char result[15];
+    int li;
+    sscanf(&mmm[6],"%d",&li);
+    printf(" le li : %d\n",li);
 
     return 0;
 }
