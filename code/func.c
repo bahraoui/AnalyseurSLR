@@ -1,22 +1,25 @@
 #include "LRGrammar.h"
 #include "read_file.h"
 
-char construire_arbre(char *arbre, char *pile, rule parRule, char *arbreSize)
+void construire_arbre(char *arbre, char *pile, rule parRule, char *arbreSize)
 {
-    char a = *(arbreSize);
+    char oldArbreSize = (*arbreSize);
+    printf("#c#%d##",(*arbreSize));
     if (strlen(parRule.rhs) == 0)
     {
-        a += 3;
-        arbre = (char *)realloc(arbre, a * sizeof(char));
-        sprintf(&arbre[a - 3], "%c()", parRule.lhs);
+        (*arbreSize) += 3;
+        //*(arbreSize) += 3;
+        arbre = (char *)realloc(arbre, (*arbreSize) * sizeof(char));
+        sprintf(&arbre[(*arbreSize) - 3], "%c()", parRule.lhs);
     }
     else
     {
         size_t i = 0, indexNonFinal = 0;
         int size = strlen(parRule.rhs), parOuvrante = 0, parFermante = 0, debut=-1;
-        char *newArbre = calloc(size * 3 + a + 3, sizeof(char));
+        char *newArbre = calloc(size * 3 + (*arbreSize) + 3, sizeof(char));
         char terminaux[6];
         sprintf(newArbre, "%c(", parRule.lhs);
+        (*arbreSize)+=2;
         
         for (i = 0; i < size; i++)
         {
@@ -26,13 +29,13 @@ char construire_arbre(char *arbre, char *pile, rule parRule, char *arbreSize)
                 {
                     sprintf(terminaux, "\'%c\'()", parRule.rhs[i]);
                     strcat(newArbre, terminaux);
-                    a += 5;
+                    (*arbreSize) += 5;
                 }
                 else
                 {
                     sprintf(terminaux, "%c()", parRule.rhs[i]);
                     strcat(newArbre, terminaux);
-                    a += 3;
+                    (*arbreSize) += 3;
                 }
             }
             else
@@ -58,21 +61,22 @@ char construire_arbre(char *arbre, char *pile, rule parRule, char *arbreSize)
                     indexNonFinal++;
                 }
                 strncat(newArbre, &arbre[debut], indexNonFinal - debut);
-                a += indexNonFinal - debut;
+                (*arbreSize) += indexNonFinal - debut;
             }
         }
         strcat(newArbre, ")");
-        a++;
+        (*arbreSize)++;
         printf("##n#%s###",newArbre);
-        printf("##a#%s###",arbre);
+        printf("##a%d#%s###",(*arbreSize),arbre);
         if (debut==-1)
         {
             strcat(arbre,newArbre);
         }else
         {
             strcpy(arbre, newArbre);
+            (*arbreSize) -= oldArbreSize;
         }
     }
 
-    return a;
+    return;
 }

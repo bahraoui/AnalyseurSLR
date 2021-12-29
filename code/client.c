@@ -149,7 +149,7 @@ int main(int argc, char const *argv[])
             pileSize = indexRule+2;
             // digits tout ca la >10
             tmp=fichierLu.t.trans[256 * (tmp + 1) - fichierLu.G.rules[-transMot - 1].lhs];
-            arbreSize = construire_arbre(arbre,pile,fichierLu.G.rules[-transMot - 1], &arbreSize);
+            construire_arbre(arbre,pile,fichierLu.G.rules[-transMot - 1], &arbreSize);
             printf("%s\n", pile);
             transMot = fichierLu.t.trans[256 * (tmp) + flot[0]];
         }
