@@ -81,10 +81,12 @@ int main(int argc, char const *argv[])
     /******
      * debut d'algo
      ******/
+    
     char *flot = (char *)calloc(strlen(mot), sizeof(char)); // plus tard : utiliser flot au lieu de mot
     char *pile = (char *)calloc(strlen(mot) * 4, sizeof(char));
     char *arbre = (char *)calloc(1, sizeof(char));
-    char ruleSize, tmp, indexRule, indexNbTransition, nbDigits;
+    char *neoudsRencontres = (char *)calloc(strlen(mot), sizeof(char));
+    char ruleSize, tmp, indexRule, indexNbTransition, nbDigits, nodeRecup;
     char pileSize = 1, arbreSize = 0;
     pile[0] = '0';
     strcpy(flot, mot);
@@ -95,6 +97,9 @@ int main(int argc, char const *argv[])
     signed char transMot = fichierLu.t.trans[256 * 0 + flot[0]]; // 1 realisation avant de rentrer dans la boucle
     while (1)
     {
+        // recuperation du noeud pour plus tard
+        nodeRecup = recup_node(flot[0], transMot, fichierLu.G);
+
         // dans le cas d'un decalage
         if (transMot > 0)
         {
@@ -149,7 +154,6 @@ int main(int argc, char const *argv[])
             pileSize = indexRule+2;
             // digits tout ca la >10
             tmp=fichierLu.t.trans[256 * (tmp + 1) - fichierLu.G.rules[-transMot - 1].lhs];
-            construire_arbre(arbre,pile,fichierLu.G.rules[-transMot - 1], &arbreSize);
             printf("%s\n", pile);
             transMot = fichierLu.t.trans[256 * (tmp) + flot[0]];
         }
@@ -160,20 +164,19 @@ int main(int argc, char const *argv[])
             print_grammar(fichierLu.G);
             exit(EXIT_FAILURE);
         }
+        
+        //construction arbre
+        construire_arbre(neoudsRencontres, nodeRecup);
     }
 
     free(pile);
     free(flot);
+    // print arbre
     printf("%s",arbre);
+
     printf("\n\n##############################\n\tFin Algo SLR\n##############################\n\n");
 
     // test 
-    
-    char *buffer="S(a()S()b())";
-    char *oldre="a()S()b()";
-    //strcpy(oldre,buffer);
-    oldre=buffer;
-    printf("oldre:%s\n",oldre);
 
 
 

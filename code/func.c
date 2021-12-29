@@ -1,14 +1,78 @@
 #include "LRGrammar.h"
 #include "read_file.h"
 
-void construire_arbre(char *arbre, char *pile, rule parRule, char *arbreSize)
+typedef struct node
 {
-    char oldArbreSize = (*arbreSize);
-    printf("#c#%d##",(*arbreSize));
+    struct node* voisins[100];
+    char value;
+    int nbvoisins;
+}node;
+
+void print_arbre(node *noeud){
+
+    printf("%c(",noeud->value);
+    if (noeud->nbvoisins>0)
+    {
+        for (size_t i = 0; i < noeud->nbvoisins; i++)
+        {
+            //printf("\t- voisin %d-%c\n",i,noeud3.voisins[i]->value);
+            print_arbre(noeud->voisins[i]);
+        }
+    }
+    printf(")");
+};
+
+int main(int argc, char const *argv[])
+{
+    node noeud1, noeud2,noeud3;
+    noeud1.value='a';
+    noeud2.value='b';
+    noeud3.value='S';
+
+    noeud3.nbvoisins=0;
+    noeud3.voisins[noeud3.nbvoisins++] = &noeud1;
+    noeud3.voisins[noeud3.nbvoisins++] = &noeud2;
+    noeud2.nbvoisins=0;
+    noeud1.nbvoisins=0;
+
+    printf("voisins de %c:\n",noeud3.value);
+    for (size_t i = 0; i < noeud3.nbvoisins; i++)
+    {
+        printf("\t- voisin %d-%c\n",i,noeud3.voisins[i]->value);
+    }
+    printf("recursif:\n");
+    print_arbre(&noeud3);
+    printf("\n");
+    return 0;
+}
+
+/**
+ * @brief recup le node.
+ * 
+ * @param caractereLu 
+ * @param transition 
+ * @param parGrammar 
+ * @return 0 si erreur
+ */
+char recup_node(char caractereLu, char transition, grammar parGrammar){
+    if (transition>0) // decalage
+    {
+        return caractereLu;
+    } else if (transition<0) // reduciton
+    {
+        return parGrammar.rules[-transition - 1].lhs;
+    }
+    return 0;
+}
+
+void construire_arbre(char *nodeRencontrees, char nodeRecup)
+{
+    
+/*
+
     if (strlen(parRule.rhs) == 0)
     {
         (*arbreSize) += 3;
-        //*(arbreSize) += 3;
         arbre = (char *)realloc(arbre, (*arbreSize) * sizeof(char));
         sprintf(&arbre[(*arbreSize) - 3], "%c()", parRule.lhs);
     }
@@ -23,7 +87,7 @@ void construire_arbre(char *arbre, char *pile, rule parRule, char *arbreSize)
         
         for (i = 0; i < size; i++)
         {
-            if (parRule.rhs[i] > 0)
+            if (parRule.rhs[i] > 0) // terminal
             {
                 if (parRule.rhs[i] == '(' || parRule.rhs[i] == ')')
                 {
@@ -38,7 +102,7 @@ void construire_arbre(char *arbre, char *pile, rule parRule, char *arbreSize)
                     (*arbreSize) += 3;
                 }
             }
-            else
+            else // non terminal
             {
                 while (arbre[indexNonFinal] != (-parRule.rhs[i]))
                 {
@@ -66,8 +130,7 @@ void construire_arbre(char *arbre, char *pile, rule parRule, char *arbreSize)
         }
         strcat(newArbre, ")");
         (*arbreSize)++;
-        printf("##n#%s###",newArbre);
-        printf("##a%d#%s###",(*arbreSize),arbre);
+        printf("##a#%s###",arbre);
         if (debut==-1)
         {
             strcat(arbre,newArbre);
@@ -76,7 +139,8 @@ void construire_arbre(char *arbre, char *pile, rule parRule, char *arbreSize)
             strcpy(arbre, newArbre);
             (*arbreSize) -= oldArbreSize;
         }
+        printf("#taille:%d#n#%s###",(*arbreSize),newArbre);
     }
-
+*/
     return;
 }
