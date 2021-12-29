@@ -1,5 +1,4 @@
-#include "LRGrammar.h"
-#include "read_file.h"
+#include "func.c"
 #define MAX_STEPS 150
 
 int main(int argc, char const *argv[])
@@ -83,11 +82,12 @@ int main(int argc, char const *argv[])
      * debut d'algo
      ******/
     char *flot = (char *)calloc(strlen(mot), sizeof(char)); // plus tard : utiliser flot au lieu de mot
-    strcpy(flot, mot);
     char *pile = (char *)calloc(strlen(mot) * 4, sizeof(char));
+    char *arbre = (char *)calloc(1, sizeof(char));
     char ruleSize, tmp, indexRule, indexNbTransition, nbDigits;
-    char pileSize = 1;
+    char pileSize = 1, arbreSize = 0;
     pile[0] = '0';
+    strcpy(flot, mot);
     printf("\n\n##############################\n\tDebut Algo SLR\n##############################\n\n\
     \tFlot\t|    Pile\n----------------------------------------\n");
     printf("\t%s\t|    %s\n", flot, pile);
@@ -127,7 +127,6 @@ int main(int argc, char const *argv[])
             printf("r%d\t%s\t|    ", -transMot, flot);
             ruleSize = strlen(fichierLu.G.rules[-transMot - 1].rhs);
             indexRule = pileSize - 1;
-            //printf("-#%d#",indexRule);
             tmp = 0;
             // indexRule correspond au premier caractere de l'expression a retrouver
             while (tmp != ruleSize){
@@ -139,19 +138,20 @@ int main(int argc, char const *argv[])
             }
             // indexNbTransition correspond au nombre precedant l'expression retrouvee
             indexNbTransition=indexRule;
-            while ('0'<=pile[indexNbTransition] && pile[indexNbTransition]<='9')
+            while ('0'<=pile[indexNbTransition-1] && pile[indexNbTransition-1]<='9')
             {
                 indexNbTransition--;
             }
             //printf("ok%d\n",indexNbTransition+1);
-            sscanf(&pile[indexNbTransition+1],"%d",&tmp);
+            sscanf(&pile[indexNbTransition],"%d",&tmp);
             sprintf(&pile[indexRule+1], "%c%d", fichierLu.G.rules[-transMot - 1].lhs, fichierLu.t.trans[256 * (tmp + 1) - fichierLu.G.rules[-transMot - 1].lhs]);
             nbDigits = 
             pileSize = indexRule+2;
             // digits tout ca la >10
             tmp=fichierLu.t.trans[256 * (tmp + 1) - fichierLu.G.rules[-transMot - 1].lhs];
-            transMot = fichierLu.t.trans[256 * (tmp) + flot[0]];
+            arbreSize = construire_arbre(arbre,pile,fichierLu.G.rules[-transMot - 1], &arbreSize);
             printf("%s\n", pile);
+            transMot = fichierLu.t.trans[256 * (tmp) + flot[0]];
         }
         // dans le cas ou le flot n'est pas accepte (ex: "aa" avec S -> aSb|ε)
         else if (transMot == 0)
@@ -164,45 +164,18 @@ int main(int argc, char const *argv[])
 
     free(pile);
     free(flot);
+    printf("%s",arbre);
     printf("\n\n##############################\n\tFin Algo SLR\n##############################\n\n");
 
-    // test suppr une partie d'une chaine en gardant son debut et sa fin
-    // ne fonctionne que si la partie a supprimer est plus grande que la partie a mettre/remplacer
-    // PPP = pile
-    // xxx 2 lettres a ajouter
-    // ok char a remplacer
-    // v1
-    /*
-    char* ppp = (char*)calloc(15,sizeof(char));
-    char* xxx = (char*)calloc(15,sizeof(char));
-    strcpy(xxx,"S9");
-    char* ok = "a1S2b3"; // str a remplacer
-    strcpy(ppp,"0a1S2b3c4"); // str de base, objectif => 0S9c4
-    printf("ppp : %s\n",ppp);
-    strncpy(&ppp[1],xxx,strlen(xxx));
-    printf("ppp : %s\n",ppp);
-    strcpy(&ppp[1+strlen(xxx)],&ppp[1+strlen(ok)]);
-    printf("ppp : %s\n",ppp);
-    */
-    // v2
-    char *oui = (char *)calloc(50, sizeof(char));
-    long nb = 159999999;
-    sprintf(oui, "%d", nb);
-    printf("oui : %s\n", oui);
-    nb = 16;
-    sprintf(&oui[2], "%c%d", 'a', nb);
-    printf("oui : %s\n", oui);
+    // test 
+    
+    char *buffer="S(a()S()b())";
+    char *oldre="a()S()b()";
+    //strcpy(oldre,buffer);
+    oldre=buffer;
+    printf("oldre:%s\n",oldre);
 
-    //**//
 
-    // v1
-    char *mmm = "0a2S3b48a45";
-    int li;
-    sscanf(&mmm[6], "%d", &li);
-    printf(" le li : %d\n", li);
-    char x = 236;
-    int count = snprintf(NULL, 0, "%i", x);
-    printf(" le count : %d\n", count);
 
     return 0;
 }
