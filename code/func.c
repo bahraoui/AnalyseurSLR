@@ -15,7 +15,7 @@ char construire_arbre(char *arbre, char *pile, rule parRule, char *arbreSize)
         size_t i = 0, indexNonFinal = 0;
         int size = strlen(parRule.rhs), parOuvrante = 0, parFermante = 0, debut;
         char *newArbre = calloc(size * 3 + a + 3, sizeof(char));
-        char terminaux[3];
+        char terminaux[6];
         sprintf(newArbre, "%c(", parRule.lhs);
         for (i = 0; i < size; i++)
         {
@@ -62,9 +62,8 @@ char construire_arbre(char *arbre, char *pile, rule parRule, char *arbreSize)
         }
         strcat(newArbre, ")");
         a++;
-        // printf("###%s###",newArbre);
+        printf("###%s###",newArbre);
         strcpy(arbre, newArbre);
-        free(newArbre);
     }
 
     return a;
