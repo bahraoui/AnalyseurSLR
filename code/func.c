@@ -22,6 +22,7 @@ void print_arbre(node *noeud){
     printf(")");
 };
 
+/*
 int main(int argc, char const *argv[])
 {
     node noeud1, noeud2,noeud3;
@@ -45,6 +46,7 @@ int main(int argc, char const *argv[])
     printf("\n");
     return 0;
 }
+*/
 
 /**
  * @brief recup le node.
@@ -55,18 +57,39 @@ int main(int argc, char const *argv[])
  * @return 0 si erreur
  */
 char recup_node(char caractereLu, char transition, grammar parGrammar){
-    if (transition>0) // decalage
+    if (transition==-127) // accept
+    {
+        return 0;
+    }
+    else if (transition>0) // decalage
     {
         return caractereLu;
     } else if (transition<0) // reduciton
     {
         return parGrammar.rules[-transition - 1].lhs;
     }
-    return 0;
+    return 0; // erreur
 }
 
-void construire_arbre(char *nodeRencontrees, char nodeRecup)
+void construire_arbre(node *nodeRencontrees, int sizeNodeRencontrees, char nodeRecup, signed char transition)
 {
+    if (nodeRecup==0) // accept ou erreur
+    {
+        return;
+    }
+    else if (transition<0) // reduction
+    {
+        /* code */
+    }
+    else if (transition>0) // decalage
+    {
+        node *terminal;
+        terminal->nbvoisins = 0;
+        terminal->value = nodeRecup;
+        nodeRencontrees[sizeNodeRencontrees++]=&terminal;
+    }
+    
+    
     
 /*
 

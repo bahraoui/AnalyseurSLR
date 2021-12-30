@@ -3,7 +3,6 @@
 
 int main(int argc, char const *argv[])
 {
-    size_t j;
     /****************************
      *
      *  Verification du bon nombre d'arguments [Bon nombre = 2]
@@ -78,16 +77,19 @@ int main(int argc, char const *argv[])
      *
     ##########################*/
 
-    /******
-     * debut d'algo
-     ******/
+    
+    /****************************
+     *
+     *  Debut d'algo
+     *
+     ****************************/
     
     char *flot = (char *)calloc(strlen(mot), sizeof(char)); // plus tard : utiliser flot au lieu de mot
     char *pile = (char *)calloc(strlen(mot) * 4, sizeof(char));
     char *arbre = (char *)calloc(1, sizeof(char));
-    char *neoudsRencontres = (char *)calloc(strlen(mot), sizeof(char));
-    char ruleSize, tmp, indexRule, indexNbTransition, nbDigits, nodeRecup;
-    char pileSize = 1, arbreSize = 0;
+    node *neoudsRencontresOrphelins = (node *)calloc(strlen(mot), sizeof(node));
+    char ruleSize, tmp, nodeRecup;
+    size_t indexRule,indexNbTransition, pileSize = 1;
     pile[0] = '0';
     strcpy(flot, mot);
     printf("\n\n##############################\n\tDebut Algo SLR\n##############################\n\n\
@@ -97,8 +99,10 @@ int main(int argc, char const *argv[])
     signed char transMot = fichierLu.t.trans[256 * 0 + flot[0]]; // 1 realisation avant de rentrer dans la boucle
     while (1)
     {
-        // recuperation du noeud pour plus tard
+        // recuperation du noeud pour la construction de l'arbre
         nodeRecup = recup_node(flot[0], transMot, fichierLu.G);
+        //construction arbre
+        construire_arbre(neoudsRencontresOrphelins, nodeRecup, transMot);
 
         // dans le cas d'un decalage
         if (transMot > 0)
@@ -130,7 +134,7 @@ int main(int argc, char const *argv[])
         else if (transMot < 0)
         {
             printf("r%d\t%s\t|    ", -transMot, flot);
-            ruleSize = strlen(fichierLu.G.rules[-transMot - 1].rhs);
+            ruleSize = strlen((const char*)fichierLu.G.rules[-transMot - 1].rhs);
             indexRule = pileSize - 1;
             tmp = 0;
             // indexRule correspond au premier caractere de l'expression a retrouver
@@ -148,9 +152,8 @@ int main(int argc, char const *argv[])
                 indexNbTransition--;
             }
             //printf("ok%d\n",indexNbTransition+1);
-            sscanf(&pile[indexNbTransition],"%d",&tmp);
+            sscanf(&pile[indexNbTransition],"%hhd",&tmp);
             sprintf(&pile[indexRule+1], "%c%d", fichierLu.G.rules[-transMot - 1].lhs, fichierLu.t.trans[256 * (tmp + 1) - fichierLu.G.rules[-transMot - 1].lhs]);
-            nbDigits = 
             pileSize = indexRule+2;
             // digits tout ca la >10
             tmp=fichierLu.t.trans[256 * (tmp + 1) - fichierLu.G.rules[-transMot - 1].lhs];
@@ -165,20 +168,18 @@ int main(int argc, char const *argv[])
             exit(EXIT_FAILURE);
         }
         
-        //construction arbre
-        construire_arbre(neoudsRencontres, nodeRecup);
     }
 
-    free(pile);
-    free(flot);
     // print arbre
     printf("%s",arbre);
 
     printf("\n\n##############################\n\tFin Algo SLR\n##############################\n\n");
 
-    // test 
-
-
+    /*##########################
+     *
+     * FFin d'algo
+     *
+    ##########################*/
 
     return 0;
 }
