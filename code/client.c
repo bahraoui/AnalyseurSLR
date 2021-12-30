@@ -101,8 +101,8 @@ int main(int argc, char const *argv[])
     {
         // recuperation du noeud pour la construction de l'arbre
         nodeRecup = recup_node(flot[0], transMot, fichierLu.G);
-        //construction arbre
-        construire_arbre(neoudsRencontresOrphelins, nodeRecup, transMot);
+        //construction arbre [NULL a changer par la taille de noeuds...Orphelins]
+        construire_arbre(neoudsRencontresOrphelins, NULL, nodeRecup, transMot);
 
         // dans le cas d'un decalage
         if (transMot > 0)

@@ -77,19 +77,19 @@ void construire_arbre(node *nodeRencontrees, int sizeNodeRencontrees, char nodeR
     {
         return;
     }
-    else if (transition<0) // reduction
+
+    node terminal;
+    terminal.nbvoisins = 0;
+    terminal.value = nodeRecup;
+    if (transition<0) // reduction
     {
         /* code */
     }
     else if (transition>0) // decalage
     {
-        node *terminal;
-        terminal->nbvoisins = 0;
-        terminal->value = nodeRecup;
-        nodeRencontrees[sizeNodeRencontrees++]=&terminal;
+        nodeRencontrees[sizeNodeRencontrees]=terminal;
+        sizeNodeRencontrees++;
     }
-    
-    
     
 /*
 
