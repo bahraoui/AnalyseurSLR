@@ -89,6 +89,7 @@ int main(int argc, char const *argv[])
     char *arbre = (char *)calloc(1, sizeof(char));
     node *neoudsRencontresOrphelins = (node *)calloc(strlen(mot), sizeof(node));
     char ruleSize, tmp, nodeRecup;
+    int sizeArbre=0;
     size_t indexRule,indexNbTransition, pileSize = 1;
     pile[0] = '0';
     strcpy(flot, mot);
@@ -102,7 +103,7 @@ int main(int argc, char const *argv[])
         // recuperation du noeud pour la construction de l'arbre
         nodeRecup = recup_node(flot[0], transMot, fichierLu.G);
         //construction arbre [NULL a changer par la taille de noeuds...Orphelins]
-        construire_arbre(neoudsRencontresOrphelins, NULL, nodeRecup, transMot);
+        construire_arbre(neoudsRencontresOrphelins, &sizeArbre, nodeRecup, transMot, fichierLu.G);
 
         // dans le cas d'un decalage
         if (transMot > 0)
@@ -172,7 +173,11 @@ int main(int argc, char const *argv[])
 
     // print arbre
     printf("%s",arbre);
-
+    //print_arbre(&neoudsRencontresOrphelins[0]);
+    for (size_t i = 0; i < neoudsRencontresOrphelins[0].nbfils; i++)
+    {
+        printf("\t- voisin %d-%c\n",i,neoudsRencontresOrphelins[0].fils[i]->value);
+    }
     printf("\n\n##############################\n\tFin Algo SLR\n##############################\n\n");
 
     /*##########################

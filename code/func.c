@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <LRGrammar.h>
+#include "LRGrammar.h"
+#include "read_file.h"
 
 typedef struct node
 {
@@ -20,9 +21,9 @@ void print_arbre(node *racine){
     printf(")");
 };
 
-void add_to_noeudRencontres(node* noeudRencontres, int taille, node nouveauNoeud){
-    noeudRencontres[taille] = nouveauNoeud;
-    taille++;
+void add_to_noeudRencontres(node* noeudRencontres, int *taille, node *nouveauNoeud){
+    noeudRencontres[(*taille)] = (*nouveauNoeud);
+    (*taille)++;
 }
 
 
@@ -49,44 +50,41 @@ char recup_node(char caractereLu, char transition, grammar parGrammar){
     return 0; // erreur
 }
 
-void construire_arbre(node *nodeRencontrees, int sizeNodeRencontrees, char nodeRecup, signed char transition)
+void construire_arbre(node *nodeRencontrees, int *sizeNodeRencontrees, char nodeRecup, signed char transition, grammar parGrammar)
 {
     if (nodeRecup==0) // accept ou erreur
     {
         return;
     }
-
+    //printf("noderecup:%c\n",nodeRecup);
     
     if (transition<0) // reduction
     {
-        char* rightRule;
         int i;
-        int sizeRightRule = strlen(rightRule), afterReductionSizeNodeRencontrees;
-        
+        int sizeRightRule = strlen(parGrammar.rules[-transition - 1].rhs), afterReductionSizeNodeRencontrees;
+        //printf("size:%d\n",sizeRightRule);
 
         node nonTerminalRegle;
         nonTerminalRegle.value = nodeRecup;
         nonTerminalRegle.nbfils = 0;
 
-        afterReductionSizeNodeRencontrees = sizeNodeRencontrees - sizeRightRule;
+        afterReductionSizeNodeRencontrees = (*sizeNodeRencontrees) - sizeRightRule;
 
-        for (i = sizeNodeRencontrees; i > afterReductionSizeNodeRencontrees; i--)
+        for (i = (*sizeNodeRencontrees); i > afterReductionSizeNodeRencontrees; i--)
         {
-            nonTerminalRegle.fils[nonTerminalRegle.nbfils] = nodeRencontrees->fils[i];
+            nonTerminalRegle.fils[nonTerminalRegle.nbfils] = &nodeRencontrees->fils[i];
             nonTerminalRegle.nbfils++;
-            sizeNodeRencontrees--;
+            (*sizeNodeRencontrees)--;
         }
         
-        add_to_noeudRencontres(nodeRencontrees,sizeNodeRencontrees,nonTerminalRegle);    
-
-
+        add_to_noeudRencontres(nodeRencontrees,sizeNodeRencontrees,&nonTerminalRegle);
     }
     else if (transition>0) // decalage
     {
         node terminal;
         terminal.nbfils = 0;
         terminal.value = nodeRecup;
-        add_to_noeudRencontres(nodeRencontrees, sizeNodeRencontrees, terminal);
+        add_to_noeudRencontres(nodeRencontrees, sizeNodeRencontrees, &terminal);
     }
     
 /*
