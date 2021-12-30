@@ -1,52 +1,30 @@
-#include "LRGrammar.h"
-#include "read_file.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <LRGrammar.h>
 
 typedef struct node
 {
-    struct node* voisins[100];
+    struct node* fils[100];
     char value;
-    int nbvoisins;
+    int nbfils;
 }node;
 
-void print_arbre(node *noeud){
-
-    printf("%c(",noeud->value);
-    if (noeud->nbvoisins>0)
+void print_arbre(node *racine){
+    printf("%c(",racine->value);
+    printf("oui\n");
+    for (size_t i = 0; i < racine->nbfils; i++)
     {
-        for (size_t i = 0; i < noeud->nbvoisins; i++)
-        {
-            //printf("\t- voisin %d-%c\n",i,noeud3.voisins[i]->value);
-            print_arbre(noeud->voisins[i]);
-        }
+        //printf("\t- voisin %d-%c\n",i,noeud3.voisins[i]->value);
+        print_arbre(racine->fils[i]);
     }
     printf(")");
 };
 
-/*
-int main(int argc, char const *argv[])
-{
-    node noeud1, noeud2,noeud3;
-    noeud1.value='a';
-    noeud2.value='b';
-    noeud3.value='S';
-
-    noeud3.nbvoisins=0;
-    noeud3.voisins[noeud3.nbvoisins++] = &noeud1;
-    noeud3.voisins[noeud3.nbvoisins++] = &noeud2;
-    noeud2.nbvoisins=0;
-    noeud1.nbvoisins=0;
-
-    printf("voisins de %c:\n",noeud3.value);
-    for (size_t i = 0; i < noeud3.nbvoisins; i++)
-    {
-        printf("\t- voisin %d-%c\n",i,noeud3.voisins[i]->value);
-    }
-    printf("recursif:\n");
-    print_arbre(&noeud3);
-    printf("\n");
-    return 0;
+void add_to_noeudRencontres(node* noeudRencontres, int taille, node nouveauNoeud){
+    noeudRencontres[taille] = nouveauNoeud;
+    taille++;
 }
-*/
+
 
 /**
  * @brief recup le node.
@@ -78,17 +56,37 @@ void construire_arbre(node *nodeRencontrees, int sizeNodeRencontrees, char nodeR
         return;
     }
 
-    node terminal;
-    terminal.nbvoisins = 0;
-    terminal.value = nodeRecup;
+    
     if (transition<0) // reduction
     {
-        /* code */
+        char* rightRule;
+        int i;
+        int sizeRightRule = strlen(rightRule), afterReductionSizeNodeRencontrees;
+        
+
+        node nonTerminalRegle;
+        nonTerminalRegle.value = nodeRecup;
+        nonTerminalRegle.nbfils = 0;
+
+        afterReductionSizeNodeRencontrees = sizeNodeRencontrees - sizeRightRule;
+
+        for (i = sizeNodeRencontrees; i > afterReductionSizeNodeRencontrees; i--)
+        {
+            nonTerminalRegle.fils[nonTerminalRegle.nbfils] = nodeRencontrees->fils[i];
+            nonTerminalRegle.nbfils++;
+            sizeNodeRencontrees--;
+        }
+        
+        add_to_noeudRencontres(nodeRencontrees,sizeNodeRencontrees,nonTerminalRegle);    
+
+
     }
     else if (transition>0) // decalage
     {
-        nodeRencontrees[sizeNodeRencontrees]=terminal;
-        sizeNodeRencontrees++;
+        node terminal;
+        terminal.nbfils = 0;
+        terminal.value = nodeRecup;
+        add_to_noeudRencontres(nodeRencontrees, sizeNodeRencontrees, terminal);
     }
     
 /*
@@ -167,3 +165,29 @@ void construire_arbre(node *nodeRencontrees, int sizeNodeRencontrees, char nodeR
 */
     return;
 }
+
+/*
+int main(int argc, char const *argv[])
+{
+    node noeud1, noeud2,noeud3;
+    noeud1.value='a';
+    noeud2.value='b';
+    noeud3.value='S';
+
+    noeud3.nbvoisins=0;
+    noeud3.voisins[noeud3.nbvoisins++] = &noeud1;
+    noeud3.voisins[noeud3.nbvoisins++] = &noeud2;
+    noeud2.nbvoisins=0;
+    noeud1.nbvoisins=0;
+
+    printf("voisins de %c:\n",noeud3.value);
+    for (size_t i = 0; i < noeud3.nbvoisins; i++)
+    {
+        printf("\t- voisin %d-%c\n",i,noeud3.voisins[i]->value);
+    }
+    printf("recursif:\n");
+    print_arbre(&noeud3);
+    printf("\n");
+    return 0;
+}
+*/

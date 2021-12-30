@@ -3,41 +3,25 @@
 
 typedef struct node
 {
-    struct node* voisins[100];
+    struct node* fils[100];
     char value;
-    int nbvoisins;
+    int nbfils;
 }node;
 
-void function_add(node** t){
-    node n4; // decalage
-    n4.value='d';
-    n4.nbvoisins=0;
-    printf("oui%d\n",t[0]->nbvoisins);
-    t[0]->voisins[t[0]->nbvoisins]=&n4; // noeud[0]<=>noeud3<=>'S' noeuds[2]=&n4;
-    t[0]->nbvoisins++;
-}
-
-void print_arbre(node *noeud){
-    printf("%c(",noeud->value);
+void print_arbre(node *racine){
+    printf("%c(",racine->value);
     printf("oui\n");
-    for (size_t i = 0; i < noeud->nbvoisins; i++)
+    for (size_t i = 0; i < racine->nbfils; i++)
     {
         //printf("\t- voisin %d-%c\n",i,noeud3.voisins[i]->value);
-        print_arbre(noeud->voisins[i]);
+        print_arbre(racine->fils[i]);
     }
     printf(")");
 };
 
-void print_arbre_debug(node *noeud){
-    printf("voisins de %c:\n",noeud[0].value);
-    for (size_t i = 0; i < noeud[0].nbvoisins; i++)
-    {
-        printf("\t- voisin %ld-%c\n",i,noeud[0].voisins[i]->value);
-    }
-};
-
-void test(node *noeud){
-    printf("#%c#\n",noeud->value);
+void add_to_noeudRencontres(node* noeudRencontres, int taille, node nouveauNoeud){
+    noeudRencontres[taille] = nouveauNoeud;
+    taille++;
 }
 
 int main(int argc, char const *argv[])
@@ -48,19 +32,19 @@ int main(int argc, char const *argv[])
     noeud2.value='b';
     noeud3.value='S';
 
-    noeud3.nbvoisins=0;
-    noeud3.voisins[noeud3.nbvoisins] = &noeud1;
-    noeud3.nbvoisins++;
-    noeud3.voisins[noeud3.nbvoisins] = &noeud2;
-    noeud3.nbvoisins++;
-    noeud2.nbvoisins=0;
-    noeud1.nbvoisins=0;
+    noeud3.nbfils=0;
+    noeud3.voisins[noeud3.nbfils] = &noeud1;
+    noeud3.nbfils++;
+    noeud3.voisins[noeud3.nbfils] = &noeud2;
+    noeud3.nbfils++;
+    noeud2.nbfils=0;
+    noeud1.nbfils=0;
 
     noeuds[0]=noeud3;
     function_add(&noeuds);
 
     printf("voisins de %c:\n",noeuds[0].value);
-    for (size_t i = 0; i < noeuds[0].nbvoisins; i++)
+    for (size_t i = 0; i < noeuds[0].nbfils; i++)
     {
         printf("\t- voisin %ld-%c\n",i,noeuds[0].voisins[i]->value);
     }
