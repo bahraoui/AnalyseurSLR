@@ -176,6 +176,7 @@ int main(int argc, char const *argv[])
     printf("arbre:\n");
     //printf("nb voisins n[0]:%d\n",neoudsRencontresOrphelins[0].nbfils);
     //print_arbre(&neoudsRencontresOrphelins[0]);
+    //printf("IN MAIN FILS DE LA RACINE : %c\n",neoudsRencontresOrphelins[0].fils[2]->value);
     printf("\narbre ok\n");
     if (neoudsRencontresOrphelins[0].fils[0]==NULL)
     {

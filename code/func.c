@@ -23,10 +23,6 @@ void print_arbre(node *racine){
     printf(")");
 };
 
-void add_to_noeudRencontres(int *taille, node *nouveauNoeud){
-    neoudsRencontresOrphelins[(*taille)] = (*nouveauNoeud);
-    (*taille)++;
-}
 
 
 /**
@@ -62,62 +58,60 @@ void construire_arbre(int *sizeNodeRencontrees, char nodeRecup, signed char tran
     
     if (transition<0) // reduction
     {
-        int i;
-        int sizeRightRule = strlen(parGrammar.rules[-transition - 1].rhs), afterReductionSizeNodeRencontrees;
-        printf("size:%d\n",sizeRightRule);
+        node nonTerminal;
+        nonTerminal.value = nodeRecup;
+        nonTerminal.nbfils = 0;
 
-        node nonTerminalRegle;
-        nonTerminalRegle.value = nodeRecup;
-        nonTerminalRegle.nbfils = 0;
+        int nbRightElement = strlen(parGrammar.rules[-transition - 1].rhs);
 
-        //afterReductionSizeNodeRencontrees = (*sizeNodeRencontrees) - sizeRightRule;
-        //printf("elts droite :%d\n",afterReductionSizeNodeRencontrees);
-
-        while (sizeRightRule!=0)
-        {
-            nonTerminalRegle.fils[nonTerminalRegle.nbfils] = &neoudsRencontresOrphelins[(*sizeNodeRencontrees)-sizeRightRule];
-            nonTerminalRegle.nbfils++;
-            sizeRightRule--;
+        if (nbRightElement == 0) {
+            printf("OH EPSYLON !!\n");
         }
-        
-        (*sizeNodeRencontrees) -= strlen(parGrammar.rules[-transition - 1].rhs);
-        //neoudsRencontresOrphelins[(*sizeNodeRencontrees)]=nonTerminalRegle;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-        for (i = (*sizeNodeRencontrees); i > afterReductionSizeNodeRencontrees; i--)
-        {
-            nonTerminalRegle.fils[nonTerminalRegle.nbfils] = &neoudsRencontresOrphelins[i];
-            nonTerminalRegle.nbfils++;
+        for (int i = 0; i < nbRightElement; i++) {
+            printf("SIZE NODE RENCONTRE : %d \n",(*sizeNodeRencontrees));
             (*sizeNodeRencontrees)--;
+            nonTerminal.fils[nonTerminal.nbfils] = &neoudsRencontresOrphelins[(*sizeNodeRencontrees)];
+            printf("NODE AJOUTE value : %c \n",neoudsRencontresOrphelins[(*sizeNodeRencontrees)].value);
+            nonTerminal.nbfils++;
         }
-*/
         
+        
+        
+        if (nbRightElement != 0) {
+            printf("ARBRE DE LOCO\n");
+            printf("value : %c \n",nonTerminal.value);
+            for (int i = 0; i < nonTerminal.nbfils; i++)
+            {
+                printf("value : %c \n",nonTerminal.fils[i]->value);
+            }
+        }
 
-        add_to_noeudRencontres(sizeNodeRencontrees,&nonTerminalRegle);
+        
+        printf("SIZE NODE RENCONTRE different : %d \n",(*sizeNodeRencontrees));
+        neoudsRencontresOrphelins[(*sizeNodeRencontrees)] = nonTerminal;
+        (*sizeNodeRencontrees)++;
+    
+
+
     }
     else if (transition>0) // decalage
     {
         node terminal;
         terminal.nbfils = 0;
         terminal.value = nodeRecup;
-        add_to_noeudRencontres(sizeNodeRencontrees, &terminal);
+        
+        
+        neoudsRencontresOrphelins[(*sizeNodeRencontrees)] = terminal;
+        (*sizeNodeRencontrees)++;
+
+
+        printf("Decalage : [#taille:%d# ",(*sizeNodeRencontrees));
+        for (size_t i = 0; i < (*sizeNodeRencontrees); i++)
+        {
+            printf("(%c,%d), ",neoudsRencontresOrphelins[i].value,neoudsRencontresOrphelins[i].value);
+        }
+        printf("]\n");
     }
     /*
     printf("[#taille:%d# ",(*sizeNodeRencontrees));
