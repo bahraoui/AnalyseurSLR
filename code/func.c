@@ -10,9 +10,11 @@ typedef struct node
     int nbfils;
 }node;
 
+node *neoudsRencontresOrphelins;
+
 void print_arbre(node *racine){
     printf("%c(",racine->value);
-    printf("oui\n");
+    //printf("oui\n");
     for (size_t i = 0; i < racine->nbfils; i++)
     {
         //printf("\t- voisin %d-%c\n",i,noeud3.voisins[i]->value);
@@ -21,8 +23,8 @@ void print_arbre(node *racine){
     printf(")");
 };
 
-void add_to_noeudRencontres(node* noeudRencontres, int *taille, node *nouveauNoeud){
-    noeudRencontres[(*taille)] = (*nouveauNoeud);
+void add_to_noeudRencontres(int *taille, node *nouveauNoeud){
+    neoudsRencontresOrphelins[(*taille)] = (*nouveauNoeud);
     (*taille)++;
 }
 
@@ -50,7 +52,7 @@ char recup_node(char caractereLu, char transition, grammar parGrammar){
     return 0; // erreur
 }
 
-void construire_arbre(node *nodeRencontrees, int *sizeNodeRencontrees, char nodeRecup, signed char transition, grammar parGrammar)
+void construire_arbre(int *sizeNodeRencontrees, char nodeRecup, signed char transition, grammar parGrammar)
 {
     if (nodeRecup==0) // accept ou erreur
     {
@@ -62,30 +64,70 @@ void construire_arbre(node *nodeRencontrees, int *sizeNodeRencontrees, char node
     {
         int i;
         int sizeRightRule = strlen(parGrammar.rules[-transition - 1].rhs), afterReductionSizeNodeRencontrees;
-        //printf("size:%d\n",sizeRightRule);
+        printf("size:%d\n",sizeRightRule);
 
         node nonTerminalRegle;
         nonTerminalRegle.value = nodeRecup;
         nonTerminalRegle.nbfils = 0;
 
-        afterReductionSizeNodeRencontrees = (*sizeNodeRencontrees) - sizeRightRule;
+        //afterReductionSizeNodeRencontrees = (*sizeNodeRencontrees) - sizeRightRule;
+        //printf("elts droite :%d\n",afterReductionSizeNodeRencontrees);
 
+        while (sizeRightRule!=0)
+        {
+            nonTerminalRegle.fils[nonTerminalRegle.nbfils] = &neoudsRencontresOrphelins[(*sizeNodeRencontrees)-sizeRightRule];
+            nonTerminalRegle.nbfils++;
+            sizeRightRule--;
+        }
+        
+        (*sizeNodeRencontrees) -= strlen(parGrammar.rules[-transition - 1].rhs);
+        //neoudsRencontresOrphelins[(*sizeNodeRencontrees)]=nonTerminalRegle;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
         for (i = (*sizeNodeRencontrees); i > afterReductionSizeNodeRencontrees; i--)
         {
-            nonTerminalRegle.fils[nonTerminalRegle.nbfils] = &nodeRencontrees->fils[i];
+            nonTerminalRegle.fils[nonTerminalRegle.nbfils] = &neoudsRencontresOrphelins[i];
             nonTerminalRegle.nbfils++;
             (*sizeNodeRencontrees)--;
         }
+*/
         
-        add_to_noeudRencontres(nodeRencontrees,sizeNodeRencontrees,&nonTerminalRegle);
+
+        add_to_noeudRencontres(sizeNodeRencontrees,&nonTerminalRegle);
     }
     else if (transition>0) // decalage
     {
         node terminal;
         terminal.nbfils = 0;
         terminal.value = nodeRecup;
-        add_to_noeudRencontres(nodeRencontrees, sizeNodeRencontrees, &terminal);
+        add_to_noeudRencontres(sizeNodeRencontrees, &terminal);
     }
+    /*
+    printf("[#taille:%d# ",(*sizeNodeRencontrees));
+    for (size_t i = 0; i < (*sizeNodeRencontrees); i++)
+    {
+        printf("(%c,%d), ",neoudsRencontresOrphelins[i].value,neoudsRencontresOrphelins[i].value);
+    }
+    //printf("%c-]\n",neoudsRencontresOrphelins[(*sizeNodeRencontrees)].value);
+    printf("-]\n");
+    */
     
 /*
 

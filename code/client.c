@@ -87,7 +87,7 @@ int main(int argc, char const *argv[])
     char *flot = (char *)calloc(strlen(mot), sizeof(char)); // plus tard : utiliser flot au lieu de mot
     char *pile = (char *)calloc(strlen(mot) * 4, sizeof(char));
     char *arbre = (char *)calloc(1, sizeof(char));
-    node *neoudsRencontresOrphelins = (node *)calloc(strlen(mot), sizeof(node));
+    neoudsRencontresOrphelins = (node *)calloc(strlen(mot), sizeof(node));
     char ruleSize, tmp, nodeRecup;
     int sizeArbre=0;
     size_t indexRule,indexNbTransition, pileSize = 1;
@@ -103,7 +103,8 @@ int main(int argc, char const *argv[])
         // recuperation du noeud pour la construction de l'arbre
         nodeRecup = recup_node(flot[0], transMot, fichierLu.G);
         //construction arbre [NULL a changer par la taille de noeuds...Orphelins]
-        construire_arbre(neoudsRencontresOrphelins, &sizeArbre, nodeRecup, transMot, fichierLu.G);
+        printf("noderecup:|%c|,transmot:|%d|\n",nodeRecup,transMot);
+        construire_arbre(&sizeArbre, nodeRecup, transMot, fichierLu.G);
 
         // dans le cas d'un decalage
         if (transMot > 0)
@@ -172,8 +173,15 @@ int main(int argc, char const *argv[])
     }
 
     // print arbre
-    printf("%s",arbre);
+    printf("arbre:\n");
+    //printf("nb voisins n[0]:%d\n",neoudsRencontresOrphelins[0].nbfils);
     //print_arbre(&neoudsRencontresOrphelins[0]);
+    printf("\narbre ok\n");
+    if (neoudsRencontresOrphelins[0].fils[0]==NULL)
+    {
+    printf("ERREUR - 1er fils NUL\n");
+    }
+    
     for (size_t i = 0; i < neoudsRencontresOrphelins[0].nbfils; i++)
     {
         printf("\t- voisin %d-%c\n",i,neoudsRencontresOrphelins[0].fils[i]->value);
