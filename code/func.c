@@ -10,7 +10,8 @@ typedef struct node
     int nbfils;
 }node;
 
-node *neoudsRencontresOrphelins;
+node **neoudsRencontresOrphelins;
+int tailleNeoudsRencontresOrphelins;
 
 void print_arbre(node *racine){
     printf("%c(",racine->value);
@@ -21,6 +22,16 @@ void print_arbre(node *racine){
         print_arbre(racine->fils[i]);
     }
     printf(")");
+};
+
+void free_arbre(node *racine){
+    if (racine != NULL) {
+        for (size_t i = 0; i < racine->nbfils; i++)
+        {
+            free_arbre(racine->fils[i]);
+        }
+        free(racine);
+    }
 };
 
 
@@ -48,7 +59,7 @@ char recup_node(char caractereLu, char transition, grammar parGrammar){
     return 0; // erreur
 }
 
-void construire_arbre(int *sizeNodeRencontrees, char nodeRecup, signed char transition, grammar parGrammar)
+void construire_arbre(char nodeRecup, signed char transition, grammar parGrammar)
 {
     if (nodeRecup==0) // accept ou erreur
     {
@@ -58,58 +69,77 @@ void construire_arbre(int *sizeNodeRencontrees, char nodeRecup, signed char tran
     
     if (transition<0) // reduction
     {
-        node nonTerminal;
-        nonTerminal.value = nodeRecup;
-        nonTerminal.nbfils = 0;
+        node *nonTerminal = (node*)malloc(sizeof(node));
+        nonTerminal->value = nodeRecup;
+        nonTerminal->nbfils = 0;
 
         int nbRightElement = strlen(parGrammar.rules[-transition - 1].rhs);
 
         if (nbRightElement == 0) {
-            printf("OH EPSYLON !!\n");
+            printf("OH EPSYLON 3!!\n");
         }
 
         for (int i = 0; i < nbRightElement; i++) {
-            printf("SIZE NODE RENCONTRE : %d \n",(*sizeNodeRencontrees));
-            (*sizeNodeRencontrees)--;
-            nonTerminal.fils[nonTerminal.nbfils] = &neoudsRencontresOrphelins[(*sizeNodeRencontrees)];
-            printf("NODE AJOUTE value : %c \n",neoudsRencontresOrphelins[(*sizeNodeRencontrees)].value);
-            nonTerminal.nbfils++;
+            
+            printf("SIZE NODE RENCONTRE : %d \n",tailleNeoudsRencontresOrphelins);
+            tailleNeoudsRencontresOrphelins--;
+            nonTerminal->fils[nonTerminal->nbfils] = neoudsRencontresOrphelins[tailleNeoudsRencontresOrphelins];
+            printf("NODE AJOUTE value : %c \n",neoudsRencontresOrphelins[tailleNeoudsRencontresOrphelins]->value);
+            nonTerminal->nbfils++;
         }
         
-        
-        
+
         if (nbRightElement != 0) {
+            printf("AVANT : %d\n",nonTerminal->fils[2]->value);
+        
+        
             printf("ARBRE DE LOCO\n");
-            printf("value : %c \n",nonTerminal.value);
-            for (int i = 0; i < nonTerminal.nbfils; i++)
+            printf("Racine : %c \n",nonTerminal->value);
+            for (int i = 0; i < nonTerminal->nbfils; i++)
             {
-                printf("value : %c \n",nonTerminal.fils[i]->value);
+                printf("Fils %d : %c \n",i, nonTerminal->fils[i]->value);
+            }
+            printf("Adresse fils 2 : %p\n",nonTerminal);
+        }
+
+        
+        printf("SIZE NODE RENCONTRE different : %d \n",tailleNeoudsRencontresOrphelins);
+        neoudsRencontresOrphelins[tailleNeoudsRencontresOrphelins] = nonTerminal;
+        tailleNeoudsRencontresOrphelins++;
+        
+
+        if (nbRightElement != 0) {
+            printf("Adresse fils 2 : %p\n",neoudsRencontresOrphelins[tailleNeoudsRencontresOrphelins-1]);
+            printf("APRES : %d\n", nonTerminal->fils[2]->value);
+            printf("ARBRE DE LOCO\n");
+            printf("Racine : %c \n",nonTerminal->value);
+            for (int i = 0; i < nonTerminal->nbfils; i++)
+            {
+                printf("Fils %d : %c \n",i, nonTerminal->fils[i]->value);
             }
         }
 
-        
-        printf("SIZE NODE RENCONTRE different : %d \n",(*sizeNodeRencontrees));
-        neoudsRencontresOrphelins[(*sizeNodeRencontrees)] = nonTerminal;
-        (*sizeNodeRencontrees)++;
-    
-
-
+       
     }
     else if (transition>0) // decalage
     {
-        node terminal;
-        terminal.nbfils = 0;
-        terminal.value = nodeRecup;
+        printf("DEDANS DECALAGE\n");
+        node* terminal = (node *)malloc(sizeof(node));
+        terminal->nbfils = 0;
+        terminal->value = nodeRecup;
         
+        printf("POST CREATION NODE\n");
         
-        neoudsRencontresOrphelins[(*sizeNodeRencontrees)] = terminal;
-        (*sizeNodeRencontrees)++;
+        neoudsRencontresOrphelins[tailleNeoudsRencontresOrphelins] = terminal;
+        printf("POST affectation\n");
+        tailleNeoudsRencontresOrphelins++;
 
 
-        printf("Decalage : [#taille:%d# ",(*sizeNodeRencontrees));
-        for (size_t i = 0; i < (*sizeNodeRencontrees); i++)
+
+        printf("Decalage : [#taille:%d# ",tailleNeoudsRencontresOrphelins);
+        for (size_t i = 0; i < tailleNeoudsRencontresOrphelins; i++)
         {
-            printf("(%c,%d), ",neoudsRencontresOrphelins[i].value,neoudsRencontresOrphelins[i].value);
+            printf("(%c,%d), ",neoudsRencontresOrphelins[i]->value,neoudsRencontresOrphelins[i]->value);
         }
         printf("]\n");
     }

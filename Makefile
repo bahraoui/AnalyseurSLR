@@ -24,3 +24,9 @@ test: $(PRECOMP)
 clean:
 	rm $(FOLDER)/*.o
 	rm $(EXE)
+
+val: $(PRECOMP)
+	@if [ -e $(EXE) ]; then rm ./$(EXE); fi
+	@$(CC) $(OPT) $(MAIN) $(PRECOMP) -o $(EXE)
+	valgrind -s --leak-check=full --show-leak-kinds=all ./$(EXE) $(FILE_TEST) $(WORD_TEST)
+	
