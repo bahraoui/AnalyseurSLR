@@ -84,12 +84,12 @@ int main(int argc, char const *argv[])
      *
      ****************************/
     
-    char *flot = (char *)calloc(strlen(mot)+1, sizeof(char)); // plus tard : utiliser flot au lieu de mot
+    char *flot = (char *)calloc(strlen(mot)+1, sizeof(char));
     char *pile = (char *)calloc(strlen(mot) * 512, sizeof(char));
-    neoudsRencontresOrphelins = (node **)malloc(strlen(mot) * 1000 * sizeof(node *)); //A CHANGER BUFFER
+    neoudsRencontresOrphelins = (node **)malloc(strlen(mot) * 512 * sizeof(node *));
     tailleNeoudsRencontresOrphelins = 0;
     char ruleSize, tmp, nodeRecup;
-    size_t indexRule,indexNbTransition, pileSize = 1;
+    size_t indexRule, indexNbTransition, pileSize = 1;
     pile[0] = '0';
     strcpy(flot, mot);
     printf("\n\n##############################\n\tDebut Algo SLR\n##############################\n\n\
@@ -101,8 +101,7 @@ int main(int argc, char const *argv[])
     {
         // recuperation du noeud pour la construction de l'arbre
         nodeRecup = recup_node(flot[0], transMot, fichierLu.G);
-        //construction arbre [NULL a changer par la taille de noeuds...Orphelins]
-        printf("noderecup:|%c|,transmot:|%d|\n",nodeRecup,transMot);
+        //construction arbre
         construire_arbre(nodeRecup, transMot, fichierLu.G);
 
         // dans le cas d'un decalage
@@ -115,7 +114,7 @@ int main(int argc, char const *argv[])
             }
             else
             {
-                pileSize += snprintf(NULL, 0, "%i", transMot) + 1;
+                pileSize += snprintf(NULL, 0, "%i", transMot) + 1; // snprintf donne le nombre de caracteres necessaires pour ecrire le nombre [1567 => 4]
             }
             if (flot[0] != '\0')
             {
@@ -134,7 +133,7 @@ int main(int argc, char const *argv[])
         // dans le cas d'une reduction
         else if (transMot < 0)
         {
-            printf("r%d\t%s\t|    \n", -transMot, flot);
+            printf("r%d\t%s\t|    ", -transMot, flot);
             ruleSize = strlen((const char*)fichierLu.G.rules[-transMot - 1].rhs);
             indexRule = pileSize - 1;
             tmp = 0;
@@ -149,54 +148,37 @@ int main(int argc, char const *argv[])
             
             // indexNbTransition correspond au nombre precedant l'expression retrouvee
             indexNbTransition=indexRule;
-            printf("AVANT WHILE\n");
             if (indexNbTransition > 0) {
                 while ('0'<=pile[indexNbTransition-1] && pile[indexNbTransition-1]<='9')
                 {
                     indexNbTransition--;
                 }
             }
-            printf("POST WHILE\n");
-            //printf("ok%d\n",indexNbTransition+1);
             sscanf(&pile[indexNbTransition],"%hhd",&tmp);
-            sprintf(&pile[indexRule+1], "%c%d", fichierLu.G.rules[-transMot - 1].lhs, fichierLu.t.trans[256 * (tmp + 1) - fichierLu.G.rules[-transMot - 1].lhs]);
+            sprintf(&pile[indexRule+1], "%c%d", fichierLu.G.rules[-transMot - 1].lhs, fichierLu.t.trans[256 * ((tmp) + 1) - fichierLu.G.rules[-transMot - 1].lhs]);
             pileSize = indexRule+2;
-            // digits tout ca la >10
             tmp=fichierLu.t.trans[256 * (tmp + 1) - fichierLu.G.rules[-transMot - 1].lhs];
             printf("%s\n", pile);
             transMot = fichierLu.t.trans[256 * (tmp) + flot[0]];
         }
-        // dans le cas ou le flot n'est pas accepte (ex: "aa" avec S -> aSb|ε)
+        // dans le cas ou le flot n'est pas accepte (ex: "aa" avec S -> aSb|epsylon)
         else if (transMot == 0)
         {
             fprintf(stderr, "ATTENTION - Le mot \"%s\" n'est pas acceptable pour la grammaire suivante : \n",mot);
             print_grammar(fichierLu.G);
             exit(EXIT_FAILURE);
         }
-        
     }
-    printf("SORT DU WHILE\n");
-
     // print arbre
     printf("arbre:\n");
-    //printf("nb voisins n[0]:%d\n",neoudsRencontresOrphelins[0].nbfils);
-    print_arbre(&neoudsRencontresOrphelins[0]);
-    //printf("IN MAIN FILS DE LA RACINE : %c\n",neoudsRencontresOrphelins[0].fils[2]->value);
-    printf("\narbre ok\n");
-    if (neoudsRencontresOrphelins[0]->fils[0]==NULL)
-    {
-    printf("ERREUR - 1er fils NUL\n");
-    }
-    
-    for (size_t i = 0; i < neoudsRencontresOrphelins[0]->nbfils; i++)
-    {
-        printf("\t- voisin %d-%c\n",i,neoudsRencontresOrphelins[0]->fils[i]->value);
-    }
+    print_arbre(neoudsRencontresOrphelins[0]);
+    printf("\narbre pretty:\n");
+    print_arbre_pretty(neoudsRencontresOrphelins[0],0);
     printf("\n\n##############################\n\tFin Algo SLR\n##############################\n\n");
 
     /*##########################
      *
-     * FFin d'algo
+     * Fin d'algo
      *
     ##########################*/
     
@@ -205,7 +187,6 @@ int main(int argc, char const *argv[])
     free(fichier);
     free(pile);
     free_arbre(neoudsRencontresOrphelins[0]);
-
     free(neoudsRencontresOrphelins);
     return 0;
 }

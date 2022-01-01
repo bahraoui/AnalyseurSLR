@@ -5,7 +5,7 @@ FOLDER=code
 MAIN=$(FOLDER)/client.c
 EXE=LRanalyzer
 DEPS=$(FOLDER)/LRGrammar.h $(FOLDER)/read_file.h
-PRECOMP=$(FOLDER)/LRGrammar.o $(FOLDER)/read_file.o
+PRECOMP=$(DEPS:.h=.o)
 FILE_TEST=assets/toto
 WORD_TEST="ab"
 
@@ -22,7 +22,7 @@ test: $(PRECOMP)
 	./$(EXE) $(FILE_TEST) $(WORD_TEST)
 
 clean:
-	rm $(FOLDER)/*.o
+	rm $(PRECOMP)
 	rm $(EXE)
 
 val: $(PRECOMP)
