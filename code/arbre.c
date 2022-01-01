@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "LRGrammar.h"
 #include "read_file.h"
 
@@ -12,6 +10,48 @@ typedef struct node
 
 node **neoudsRencontresOrphelins;
 int tailleNeoudsRencontresOrphelins;
+
+/**
+ * @brief 
+ * 
+ * @param racine 
+ */
+void print_arbre(node *racine);
+
+/**
+ * @brief 
+ * 
+ * @param racine 
+ * @param indentation 
+ */
+void print_arbre_pretty(node *racine,int indentation);
+
+/**
+ * @brief 
+ * 
+ * @param racine 
+ */
+void free_arbre(node *racine);
+
+/**
+ * @brief recup le node.
+ * 
+ * @param caractereLu 
+ * @param transition 
+ * @param parGrammar 
+ * @return 0 si erreur
+ */
+char recup_node(char caractereLu, char transition, grammar parGrammar);
+
+/**
+ * @brief 
+ * 
+ * @param nodeRecup 
+ * @param transition 
+ * @param parGrammar 
+ */
+void construire_arbre(char nodeRecup, signed char transition, grammar parGrammar);
+
 
 void print_arbre(node *racine){
     printf("%c(",racine->value);

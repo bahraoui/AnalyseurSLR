@@ -1,4 +1,4 @@
-#include "func.c"
+#include "arbre.c"
 #define MAX_STEPS 150
 
 int main(int argc, char const *argv[])
@@ -88,66 +88,66 @@ int main(int argc, char const *argv[])
     char *pile = (char *)calloc(strlen(mot) * 512, sizeof(char));
     neoudsRencontresOrphelins = (node **)malloc(strlen(mot) * 512 * sizeof(node *));
     tailleNeoudsRencontresOrphelins = 0;
-    char ruleSize, tmp, nodeRecup;
-    size_t indexRule, indexNbTransition, pileSize = 1;
+    char tailleRegle, tmp, neoudRecupere;
+    size_t indexRegle, indexNbTransition, taillePile = 1;
     pile[0] = '0';
     strcpy(flot, mot);
     printf("\n\n##############################\n\tDebut Algo SLR\n##############################\n\n\
     \tFlot\t|    Pile\n----------------------------------------\n");
     printf("\t%s\t|    %s\n", flot, pile);
 
-    signed char transMot = fichierLu.t.trans[256 * 0 + flot[0]]; // 1 realisation avant de rentrer dans la boucle
+    signed char transitionMotEnCours = fichierLu.t.trans[256 * 0 + flot[0]]; // 1 realisation avant de rentrer dans la boucle
     while (1)
     {
         // recuperation du noeud pour la construction de l'arbre
-        nodeRecup = recup_node(flot[0], transMot, fichierLu.G);
+        neoudRecupere = recup_node(flot[0], transitionMotEnCours, fichierLu.G);
         //construction arbre
-        construire_arbre(nodeRecup, transMot, fichierLu.G);
+        construire_arbre(neoudRecupere, transitionMotEnCours, fichierLu.G);
 
         // dans le cas d'un decalage
-        if (transMot > 0)
+        if (transitionMotEnCours > 0)
         {
-            sprintf(&pile[pileSize], "%c%d", flot[0], transMot);
-            if (transMot < 10)
+            sprintf(&pile[taillePile], "%c%d", flot[0], transitionMotEnCours);
+            if (transitionMotEnCours < 10)
             {
-                pileSize += 2;
+                taillePile += 2;
             }
             else
             {
-                pileSize += snprintf(NULL, 0, "%i", transMot) + 1; // snprintf donne le nombre de caracteres necessaires pour ecrire le nombre [1567 => 4]
+                taillePile += snprintf(NULL, 0, "%i", transitionMotEnCours) + 1; // snprintf donne le nombre de caracteres necessaires pour ecrire le nombre [1567 => 4]
             }
             if (flot[0] != '\0')
             {
                 memmove(flot, flot + 1, strlen(flot)); // enleve le 1er caracatere de flot
             }
-            printf("d%d\t%s\t|    ", transMot, flot);
+            printf("d%d\t%s\t|    ", transitionMotEnCours, flot);
             printf("%s\n", pile);
-            transMot = fichierLu.t.trans[256 * transMot + flot[0]];
+            transitionMotEnCours = fichierLu.t.trans[256 * transitionMotEnCours + flot[0]];
         }
         // dans le cas de fin de flot et d'acceptation
-        else if (transMot == -127)
+        else if (transitionMotEnCours == -127)
         {
             printf("\t\taccept\n");
             break;
         }
         // dans le cas d'une reduction
-        else if (transMot < 0)
+        else if (transitionMotEnCours < 0)
         {
-            printf("r%d\t%s\t|    ", -transMot, flot);
-            ruleSize = strlen((const char*)fichierLu.G.rules[-transMot - 1].rhs);
-            indexRule = pileSize - 1;
+            printf("r%d\t%s\t|    ", -transitionMotEnCours, flot);
+            tailleRegle = strlen((const char*)fichierLu.G.rules[-transitionMotEnCours - 1].rhs);
+            indexRegle = taillePile - 1;
             tmp = 0;
             // indexRule correspond au premier caractere de l'expression a retrouver
-            while (tmp != ruleSize){
-                if ('0'>pile[indexRule] || pile[indexRule]>'9')
+            while (tmp != tailleRegle){
+                if ('0'>pile[indexRegle] || pile[indexRegle]>'9')
                 {
                     tmp++;
                 }
-                indexRule--;
+                indexRegle--;
             }
             
             // indexNbTransition correspond au nombre precedant l'expression retrouvee
-            indexNbTransition=indexRule;
+            indexNbTransition=indexRegle;
             if (indexNbTransition > 0) {
                 while ('0'<=pile[indexNbTransition-1] && pile[indexNbTransition-1]<='9')
                 {
@@ -155,14 +155,14 @@ int main(int argc, char const *argv[])
                 }
             }
             sscanf(&pile[indexNbTransition],"%hhd",&tmp);
-            sprintf(&pile[indexRule+1], "%c%d", fichierLu.G.rules[-transMot - 1].lhs, fichierLu.t.trans[256 * ((tmp) + 1) - fichierLu.G.rules[-transMot - 1].lhs]);
-            pileSize = indexRule+2;
-            tmp=fichierLu.t.trans[256 * (tmp + 1) - fichierLu.G.rules[-transMot - 1].lhs];
+            sprintf(&pile[indexRegle+1], "%c%d", fichierLu.G.rules[-transitionMotEnCours - 1].lhs, fichierLu.t.trans[256 * ((tmp) + 1) - fichierLu.G.rules[-transitionMotEnCours - 1].lhs]);
+            taillePile = indexRegle+2;
+            tmp=fichierLu.t.trans[256 * (tmp + 1) - fichierLu.G.rules[-transitionMotEnCours - 1].lhs];
             printf("%s\n", pile);
-            transMot = fichierLu.t.trans[256 * (tmp) + flot[0]];
+            transitionMotEnCours = fichierLu.t.trans[256 * (tmp) + flot[0]];
         }
         // dans le cas ou le flot n'est pas accepte (ex: "aa" avec S -> aSb|epsylon)
-        else if (transMot == 0)
+        else if (transitionMotEnCours == 0)
         {
             fprintf(stderr, "ATTENTION - Le mot \"%s\" n'est pas acceptable pour la grammaire suivante : \n",mot);
             print_grammar(fichierLu.G);
