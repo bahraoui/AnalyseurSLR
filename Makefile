@@ -4,7 +4,7 @@ OPTS=-Wall
 FOLDER=code
 MAIN=$(FOLDER)/client.c
 EXE=LRanalyzer
-DEPS=$(FOLDER)/LRGrammar.h $(FOLDER)/read_file.h
+DEPS=$(FOLDER)/LRGrammar.h $(FOLDER)/read_file.h $(FOLDER)/arbre.h
 PRECOMP=$(DEPS:.h=.o)
 FILE_TEST=assets/toto
 WORD_TEST="aabb"

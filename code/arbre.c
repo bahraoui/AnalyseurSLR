@@ -1,57 +1,7 @@
-#include "LRGrammar.h"
-#include "read_file.h"
-
-typedef struct noeud
-{
-    struct noeud* fils[100];
-    char value;
-    int nbfils;
-}noeud;
+#include "arbre.h"
 
 noeud **neoudsRencontresOrphelins;
 int tailleNeoudsRencontresOrphelins;
-
-/**
- * @brief 
- * 
- * @param racine 
- */
-void print_arbre(noeud *racine);
-
-/**
- * @brief 
- * 
- * @param racine 
- * @param indentation 
- */
-void print_arbre_pretty(noeud *racine,int indentation);
-
-/**
- * @brief 
- * 
- * @param racine 
- */
-void free_arbre(noeud *racine);
-
-/**
- * @brief recup le noeud.
- * 
- * @param caractereLu 
- * @param transition 
- * @param parGrammar 
- * @return 0 si erreur
- */
-char recuperer_node(char caractereLu, char transition, grammar parGrammar);
-
-/**
- * @brief 
- * 
- * @param nodeRecup 
- * @param transition 
- * @param parGrammar 
- */
-void construire_arbre(char nodeRecup, signed char transition, grammar parGrammar);
-
 
 void print_arbre(noeud *racine){
     printf("%c(",racine->value);
@@ -99,7 +49,7 @@ void free_arbre(noeud *racine){
 
 
 /**
- * @brief recup le noeud.
+ * @brief recup le noeud
  * 
  * @param caractereLu 
  * @param transition 

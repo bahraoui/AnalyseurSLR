@@ -1,4 +1,4 @@
-#include "arbre.c"
+#include "arbre.h"
 #define MAX_STEPS 150
 
 int main(int argc, char const *argv[])
@@ -82,11 +82,16 @@ int main(int argc, char const *argv[])
      *  Debut d'algo
      *
      ****************************/
-    
-    char *flot = (char *)calloc(strlen(mot)+1, sizeof(char));
-    char *pile = (char *)calloc(strlen(mot) * 512, sizeof(char));
+    /**
+     * var. globales
+     */
     neoudsRencontresOrphelins = (noeud **)malloc(strlen(mot) * 512 * sizeof(noeud *));
     tailleNeoudsRencontresOrphelins = 0;
+    /**
+     * var. locales
+     */
+    char *flot = (char *)calloc(strlen(mot)+1, sizeof(char));
+    char *pile = (char *)calloc(strlen(mot) * 512, sizeof(char));
     char tailleRegle, tmp, neoudRecupere;
     size_t indexRegle, indexNbTransition, taillePile = 1;
     pile[0] = '0';
