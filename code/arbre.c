@@ -1,14 +1,14 @@
 #include "LRGrammar.h"
 #include "read_file.h"
 
-typedef struct node
+typedef struct noeud
 {
-    struct node* fils[100];
+    struct noeud* fils[100];
     char value;
     int nbfils;
-}node;
+}noeud;
 
-node **neoudsRencontresOrphelins;
+noeud **neoudsRencontresOrphelins;
 int tailleNeoudsRencontresOrphelins;
 
 /**
@@ -16,7 +16,7 @@ int tailleNeoudsRencontresOrphelins;
  * 
  * @param racine 
  */
-void print_arbre(node *racine);
+void print_arbre(noeud *racine);
 
 /**
  * @brief 
@@ -24,24 +24,24 @@ void print_arbre(node *racine);
  * @param racine 
  * @param indentation 
  */
-void print_arbre_pretty(node *racine,int indentation);
+void print_arbre_pretty(noeud *racine,int indentation);
 
 /**
  * @brief 
  * 
  * @param racine 
  */
-void free_arbre(node *racine);
+void free_arbre(noeud *racine);
 
 /**
- * @brief recup le node.
+ * @brief recup le noeud.
  * 
  * @param caractereLu 
  * @param transition 
  * @param parGrammar 
  * @return 0 si erreur
  */
-char recup_node(char caractereLu, char transition, grammar parGrammar);
+char recuperer_node(char caractereLu, char transition, grammar parGrammar);
 
 /**
  * @brief 
@@ -53,7 +53,7 @@ char recup_node(char caractereLu, char transition, grammar parGrammar);
 void construire_arbre(char nodeRecup, signed char transition, grammar parGrammar);
 
 
-void print_arbre(node *racine){
+void print_arbre(noeud *racine){
     printf("%c(",racine->value);
     for (size_t i = 0; i < racine->nbfils; i++)
     {
@@ -62,9 +62,9 @@ void print_arbre(node *racine){
     printf(")");
 };
 
-void print_arbre_pretty(node *racine,int indentation){
+void print_arbre_pretty(noeud *racine,int indentation){
     for (size_t i = 0; i < indentation; i++)
-    {        
+    {
         printf("   ");
     }
     if (indentation) // autres noeuds
@@ -83,10 +83,10 @@ void print_arbre_pretty(node *racine,int indentation){
     for (size_t i = 0; i < racine->nbfils; i++)
     {
         print_arbre_pretty(racine->fils[i],indentation + 1);
-    }    
+    }
 };
 
-void free_arbre(node *racine){
+void free_arbre(noeud *racine){
     if (racine != NULL) {
         for (size_t i = 0; i < racine->nbfils; i++)
         {
@@ -99,14 +99,14 @@ void free_arbre(node *racine){
 
 
 /**
- * @brief recup le node.
+ * @brief recup le noeud.
  * 
  * @param caractereLu 
  * @param transition 
  * @param parGrammar 
  * @return 0 si erreur
  */
-char recup_node(char caractereLu, char transition, grammar parGrammar){
+char recuperer_node(char caractereLu, char transition, grammar parGrammar){
     if (transition==-127) // accept
     {
         return 0;
@@ -130,24 +130,23 @@ void construire_arbre(char nodeRecup, signed char transition, grammar parGrammar
     
     if (transition<0) // reduction
     {
-        node *nonTerminal = (node*)malloc(sizeof(node));
+        noeud *nonTerminal = (noeud*)malloc(sizeof(noeud));
         nonTerminal->value = nodeRecup;
         nonTerminal->nbfils = 0;
 
         int nbRightElement = strlen((const char*)parGrammar.rules[-transition - 1].rhs);
-        while (nbRightElement!=0)
+        for (size_t i = nbRightElement; i != 0; i--)
         {
-            nonTerminal->fils[nonTerminal->nbfils] = neoudsRencontresOrphelins[tailleNeoudsRencontresOrphelins-nbRightElement];
+            nonTerminal->fils[nonTerminal->nbfils] = neoudsRencontresOrphelins[tailleNeoudsRencontresOrphelins-i];
             nonTerminal->nbfils++;
-            nbRightElement--;
         }
-        tailleNeoudsRencontresOrphelins -= strlen((const char*)parGrammar.rules[-transition - 1].rhs);
+        tailleNeoudsRencontresOrphelins -= nbRightElement;
         neoudsRencontresOrphelins[tailleNeoudsRencontresOrphelins] = nonTerminal;
         tailleNeoudsRencontresOrphelins++;
     }
     else if (transition>0) // decalage
     {
-        node* terminal = (node *)malloc(sizeof(node));
+        noeud* terminal = (noeud *)malloc(sizeof(noeud));
         terminal->nbfils = 0;
         terminal->value = nodeRecup;
         

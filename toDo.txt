@@ -1,0 +1,7 @@
+- arbre.h (multiple definition of error)
+- outils.h/analyseurLR.h where there will be all the big while(1) code [client.c keep while and each "if(transition)" launch a specific function called decalage(), reduction() or grammar_accept()/grammar_denied()]
+- check that analyseurLR.h/.c will not erase datas of variables in the while.
+- rename all variables in french
+- rename all variables and create new ones so tmp doesnt exist
+- rename all variables in a sense they make sense in their context
+- write rapport

@@ -35,7 +35,7 @@ int main(int argc, char const *argv[])
     // Verification du fichier en entree [Premier argument]
 
     char *fichier = (char *)malloc(strlen(argv[1]) + 1);
-    file_read fichierLu;
+    file_read grammaireEtTable;
     strcpy(fichier, argv[1]);
 
     FILE *file = fopen(fichier, "r+");
@@ -44,7 +44,7 @@ int main(int argc, char const *argv[])
     {
         printf("Lecture du fichier en cours ... \xE2\x9C\x94\n");
         printf("Validation du fichier en cours ...\r");
-        fichierLu = read_file(fichier);
+        grammaireEtTable = read_file(fichier);
         printf("Validation du fichier en cours ... \xE2\x9C\x94\n");
         fclose(file);
     }
@@ -63,8 +63,7 @@ int main(int argc, char const *argv[])
 
     // Lecture du mot en entree [Second Argument] :
     printf("Lecture du mot en cours ...\r");
-    char taille_mot = strlen(argv[2]) + 1;
-    char *mot = (char *)calloc(taille_mot, sizeof(char));
+    char *mot = (char *)calloc(strlen(argv[2]) + 1, sizeof(char));
     strcpy(mot, argv[2]);
     printf("Lecture du mot en cours ... \xE2\x9C\x94\n");
 
@@ -86,7 +85,7 @@ int main(int argc, char const *argv[])
     
     char *flot = (char *)calloc(strlen(mot)+1, sizeof(char));
     char *pile = (char *)calloc(strlen(mot) * 512, sizeof(char));
-    neoudsRencontresOrphelins = (node **)malloc(strlen(mot) * 512 * sizeof(node *));
+    neoudsRencontresOrphelins = (noeud **)malloc(strlen(mot) * 512 * sizeof(noeud *));
     tailleNeoudsRencontresOrphelins = 0;
     char tailleRegle, tmp, neoudRecupere;
     size_t indexRegle, indexNbTransition, taillePile = 1;
@@ -96,13 +95,13 @@ int main(int argc, char const *argv[])
     \tFlot\t|    Pile\n----------------------------------------\n");
     printf("\t%s\t|    %s\n", flot, pile);
 
-    signed char transitionMotEnCours = fichierLu.t.trans[256 * 0 + flot[0]]; // 1 realisation avant de rentrer dans la boucle
+    signed char transitionMotEnCours = grammaireEtTable.t.trans[256 * 0 + flot[0]]; // 1 realisation avant de rentrer dans la boucle
     while (1)
     {
         // recuperation du noeud pour la construction de l'arbre
-        neoudRecupere = recup_node(flot[0], transitionMotEnCours, fichierLu.G);
+        neoudRecupere = recuperer_node(flot[0], transitionMotEnCours, grammaireEtTable.G);
         //construction arbre
-        construire_arbre(neoudRecupere, transitionMotEnCours, fichierLu.G);
+        construire_arbre(neoudRecupere, transitionMotEnCours, grammaireEtTable.G);
 
         // dans le cas d'un decalage
         if (transitionMotEnCours > 0)
@@ -122,7 +121,7 @@ int main(int argc, char const *argv[])
             }
             printf("d%d\t%s\t|    ", transitionMotEnCours, flot);
             printf("%s\n", pile);
-            transitionMotEnCours = fichierLu.t.trans[256 * transitionMotEnCours + flot[0]];
+            transitionMotEnCours = grammaireEtTable.t.trans[256 * transitionMotEnCours + flot[0]];
         }
         // dans le cas de fin de flot et d'acceptation
         else if (transitionMotEnCours == -127)
@@ -134,7 +133,7 @@ int main(int argc, char const *argv[])
         else if (transitionMotEnCours < 0)
         {
             printf("r%d\t%s\t|    ", -transitionMotEnCours, flot);
-            tailleRegle = strlen((const char*)fichierLu.G.rules[-transitionMotEnCours - 1].rhs);
+            tailleRegle = strlen((const char*)grammaireEtTable.G.rules[-transitionMotEnCours - 1].rhs);
             indexRegle = taillePile - 1;
             tmp = 0;
             // indexRule correspond au premier caractere de l'expression a retrouver
@@ -155,17 +154,17 @@ int main(int argc, char const *argv[])
                 }
             }
             sscanf(&pile[indexNbTransition],"%hhd",&tmp);
-            sprintf(&pile[indexRegle+1], "%c%d", fichierLu.G.rules[-transitionMotEnCours - 1].lhs, fichierLu.t.trans[256 * ((tmp) + 1) - fichierLu.G.rules[-transitionMotEnCours - 1].lhs]);
+            sprintf(&pile[indexRegle+1], "%c%d", grammaireEtTable.G.rules[-transitionMotEnCours - 1].lhs, grammaireEtTable.t.trans[256 * ((tmp) + 1) - grammaireEtTable.G.rules[-transitionMotEnCours - 1].lhs]);
             taillePile = indexRegle+2;
-            tmp=fichierLu.t.trans[256 * (tmp + 1) - fichierLu.G.rules[-transitionMotEnCours - 1].lhs];
+            tmp=grammaireEtTable.t.trans[256 * (tmp + 1) - grammaireEtTable.G.rules[-transitionMotEnCours - 1].lhs];
             printf("%s\n", pile);
-            transitionMotEnCours = fichierLu.t.trans[256 * (tmp) + flot[0]];
+            transitionMotEnCours = grammaireEtTable.t.trans[256 * (tmp) + flot[0]];
         }
         // dans le cas ou le flot n'est pas accepte (ex: "aa" avec S -> aSb|epsylon)
         else if (transitionMotEnCours == 0)
         {
             fprintf(stderr, "ATTENTION - Le mot \"%s\" n'est pas acceptable pour la grammaire suivante : \n",mot);
-            print_grammar(fichierLu.G);
+            print_grammar(grammaireEtTable.G);
             exit(EXIT_FAILURE);
         }
     }
@@ -186,6 +185,8 @@ int main(int argc, char const *argv[])
     free(mot);
     free(fichier);
     free(pile);
+    free(grammaireEtTable.G.rules);
+    free(grammaireEtTable.t.trans);
     free_arbre(neoudsRencontresOrphelins[0]);
     free(neoudsRencontresOrphelins);
     return 0;
