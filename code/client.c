@@ -1,5 +1,7 @@
+/* Authors: GUENDOUZ Reda, BAHRAOUI Marwane, 2021-2022 */
+
 #include "arbre.h"
-#define MAX_STEPS 150
+#include "analyseurLR.h"
 
 int main(int argc, char const *argv[])
 {
@@ -92,8 +94,8 @@ int main(int argc, char const *argv[])
      */
     char *flot = (char *)calloc(strlen(mot)+1, sizeof(char));
     char *pile = (char *)calloc(strlen(mot) * 512, sizeof(char));
-    char tailleRegle, tmp, neoudRecupere;
-    size_t indexRegle, indexNbTransition, taillePile = 1;
+    char neoudRecupere;
+    size_t taillePile = 1;
     pile[0] = '0';
     strcpy(flot, mot);
     printf("\n\n##############################\n\tDebut Algo SLR\n##############################\n\n\
@@ -101,7 +103,7 @@ int main(int argc, char const *argv[])
     printf("\t%s\t|    %s\n", flot, pile);
 
     signed char transitionMotEnCours = grammaireEtTable.t.trans[256 * 0 + flot[0]]; // 1 realisation avant de rentrer dans la boucle
-    while (1)
+    while (transitionMotEnCours!=-127)
     {
         // recuperation du noeud pour la construction de l'arbre
         neoudRecupere = recuperer_node(flot[0], transitionMotEnCours, grammaireEtTable.G);
@@ -111,59 +113,12 @@ int main(int argc, char const *argv[])
         // dans le cas d'un decalage
         if (transitionMotEnCours > 0)
         {
-            sprintf(&pile[taillePile], "%c%d", flot[0], transitionMotEnCours);
-            if (transitionMotEnCours < 10)
-            {
-                taillePile += 2;
-            }
-            else
-            {
-                taillePile += snprintf(NULL, 0, "%i", transitionMotEnCours) + 1; // snprintf donne le nombre de caracteres necessaires pour ecrire le nombre [1567 => 4]
-            }
-            if (flot[0] != '\0')
-            {
-                memmove(flot, flot + 1, strlen(flot)); // enleve le 1er caracatere de flot
-            }
-            printf("d%d\t%s\t|    ", transitionMotEnCours, flot);
-            printf("%s\n", pile);
-            transitionMotEnCours = grammaireEtTable.t.trans[256 * transitionMotEnCours + flot[0]];
-        }
-        // dans le cas de fin de flot et d'acceptation
-        else if (transitionMotEnCours == -127)
-        {
-            printf("\t\taccept\n");
-            break;
+            decalage(pile,flot,&taillePile,&transitionMotEnCours,grammaireEtTable.t,stdout);
         }
         // dans le cas d'une reduction
         else if (transitionMotEnCours < 0)
         {
-            printf("r%d\t%s\t|    ", -transitionMotEnCours, flot);
-            tailleRegle = strlen((const char*)grammaireEtTable.G.rules[-transitionMotEnCours - 1].rhs);
-            indexRegle = taillePile - 1;
-            tmp = 0;
-            // indexRule correspond au premier caractere de l'expression a retrouver
-            while (tmp != tailleRegle){
-                if ('0'>pile[indexRegle] || pile[indexRegle]>'9')
-                {
-                    tmp++;
-                }
-                indexRegle--;
-            }
-            
-            // indexNbTransition correspond au nombre precedant l'expression retrouvee
-            indexNbTransition=indexRegle;
-            if (indexNbTransition > 0) {
-                while ('0'<=pile[indexNbTransition-1] && pile[indexNbTransition-1]<='9')
-                {
-                    indexNbTransition--;
-                }
-            }
-            sscanf(&pile[indexNbTransition],"%hhd",&tmp);
-            sprintf(&pile[indexRegle+1], "%c%d", grammaireEtTable.G.rules[-transitionMotEnCours - 1].lhs, grammaireEtTable.t.trans[256 * ((tmp) + 1) - grammaireEtTable.G.rules[-transitionMotEnCours - 1].lhs]);
-            taillePile = indexRegle+2;
-            tmp=grammaireEtTable.t.trans[256 * (tmp + 1) - grammaireEtTable.G.rules[-transitionMotEnCours - 1].lhs];
-            printf("%s\n", pile);
-            transitionMotEnCours = grammaireEtTable.t.trans[256 * (tmp) + flot[0]];
+            reduction(pile,flot,&taillePile,&transitionMotEnCours, grammaireEtTable, stdout);
         }
         // dans le cas ou le flot n'est pas accepte (ex: "aa" avec S -> aSb|epsylon)
         else if (transitionMotEnCours == 0)
@@ -173,10 +128,11 @@ int main(int argc, char const *argv[])
             exit(EXIT_FAILURE);
         }
     }
+    printf("\t\taccept\n");
     // print arbre
-    printf("arbre:\n");
+    printf("\narbre (bien paranthésé):\n");
     print_arbre(neoudsRencontresOrphelins[0]);
-    printf("\narbre pretty:\n");
+    printf("\n\narbre (vertical):\n");
     print_arbre_pretty(neoudsRencontresOrphelins[0],0);
     printf("\n\n##############################\n\tFin Algo SLR\n##############################\n\n");
 
