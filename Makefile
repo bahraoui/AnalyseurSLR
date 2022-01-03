@@ -1,17 +1,17 @@
 # PAS DE COPIER-COLLER (makefile n'accepte que les tabs)
 CC=gcc
-OPTS=-Wall
+OPTS=-Wall -o1
 FOLDER=code
 MAIN=$(FOLDER)/client.c
 EXE=LRanalyzer
-DEPS=$(FOLDER)/LRGrammar.h $(FOLDER)/read_file.h $(FOLDER)/arbre.h
+DEPS=$(FOLDER)/LRGrammar.h $(FOLDER)/read_file.h $(FOLDER)/arbre.h $(FOLDER)/analyseurLR.h
 PRECOMP=$(DEPS:.h=.o)
 FILE_TEST=assets/toto
 WORD_TEST="aabb"
 
 all: $(PRECOMP)
 	@if [ -e $(EXE) ]; then rm ./$(EXE); fi
-	@$(CC) $(MAIN) $(PRECOMP) $(OPTS) -o $(EXE)
+	@$(CC) $(OPTS) $(MAIN) $(PRECOMP)  -o $(EXE)
 	@if [ -e $(EXE) ]; then echo 'Compilation effectue\nlancement : ./$(EXE) [fichier] [mot]'; fi
 
 %.o: %.c $(DEPS)
@@ -23,8 +23,7 @@ clean:
 
  # regle make pour tester avec un exemple simple
 test: $(PRECOMP)
-	@if [ -e $(EXE) ]; then rm ./$(EXE); fi
-	@$(CC) $(OPT) $(MAIN) $(PRECOMP) -o $(EXE)
+	@$(CC) $(OPTS) $(MAIN) $(PRECOMP) -o $(EXE)
 	./$(EXE) $(FILE_TEST) $(WORD_TEST)
 
  # regle make pour tester avec valgrind
