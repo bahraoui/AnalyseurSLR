@@ -10,7 +10,6 @@ FILE_TEST=assets/toto
 WORD_TEST="aabb"
 
 all: $(PRECOMP)
-	@if [ -e $(EXE) ]; then rm ./$(EXE); fi
 	@$(CC) $(OPTS) $(MAIN) $(PRECOMP)  -o $(EXE)
 	@if [ -e $(EXE) ]; then echo 'Compilation effectue\nlancement : ./$(EXE) [fichier] [mot]'; fi
 
@@ -18,7 +17,7 @@ all: $(PRECOMP)
 	@$(CC) -c -o $@ $<
 
 clean:
-	@if [ `ls -1 $(PRECOMP) 2>/dev/null | wc -l` -gt 0 ]; then rm $(PRECOMP); echo "everything is clean."; else echo "nothing to clean."; fi
+	@if [ `ls -1 $(PRECOMP) 2>/dev/null | wc -l` -gt 0 ]; then rm $(PRECOMP); echo "done."; else echo "nothing to clean."; fi
 	@if [ -e $(EXE) ]; then rm ./$(EXE); fi
 
  # regle make pour tester avec un exemple simple

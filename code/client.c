@@ -10,10 +10,9 @@ int main(int argc, char const *argv[])
     tailleNeoudsRencontresOrphelins = 0;
     // Var. locales
     char *mot, *flot, *pile, neoudRecupere;
-    signed char transitionMotEnCours;
+    signed char transitionEnCours;
     file_read grammaireEtTable;
     size_t taillePile = 1;
-
 
     // Verification du nombre d'arguments
     verif_args(argc);
@@ -29,40 +28,39 @@ int main(int argc, char const *argv[])
 
     // initialisation des variables
     flot = (char *)calloc(strlen(mot)+1, sizeof(char));
-    pile = (char *)calloc(strlen(mot) * 512, sizeof(char));
+    pile = (char *)calloc(strlen(mot) * 4 + 2, sizeof(char));
     pile[0] = '0';
     strcpy(flot, mot);
     neoudsRencontresOrphelins = (noeud **)malloc(strlen(mot) * 512 * sizeof(noeud *));
-    transitionMotEnCours = grammaireEtTable.t.trans[flot[0]]; // 1 realisation avant de rentrer dans la boucle
+    transitionEnCours = grammaireEtTable.t.trans[(unsigned char)flot[0]]; // 1 realisation avant de rentrer dans la boucle
 
     // 1er affichage
     printf("\n\n##############################\n\tDebut Algo SLR\n##############################\n\n\
     \tFlot\t|    Pile\n----------------------------------------\n");
     printf("\t%s\t|    %s\n", flot, pile);
 
-
-    while (transitionMotEnCours!=-127)
+    while (transitionEnCours!=-127)
     {
         // recuperation du noeud pour la construction de l'arbre
-        neoudRecupere = recuperer_node(flot[0], transitionMotEnCours, grammaireEtTable.G);
+        neoudRecupere = recuperer_node(flot[0], transitionEnCours, grammaireEtTable.G);
         //construction arbre
-        construire_arbre(neoudRecupere, transitionMotEnCours, grammaireEtTable.G);
+        construire_arbre(neoudRecupere, transitionEnCours, grammaireEtTable.G);
 
         // dans le cas d'un decalage
-        if (transitionMotEnCours > 0)
+        if (transitionEnCours > 0)
         {
-            decalage(pile, flot, &taillePile, &transitionMotEnCours, grammaireEtTable.t, stdout);
+            decalage(pile, flot, &taillePile, &transitionEnCours, grammaireEtTable.t, stdout);
         }
         // dans le cas d'une reduction
-        else if (transitionMotEnCours < 0)
+        else if (transitionEnCours < 0)
         {
-            reduction(pile, flot, &taillePile, &transitionMotEnCours, grammaireEtTable, stdout);
+            reduction(pile, flot, &taillePile, &transitionEnCours, grammaireEtTable, stdout);
         }
         // dans le cas ou le flot n'est pas accepte (ex: "aa" avec S -> aSb|epsylon)
-        else if (transitionMotEnCours == 0)
+        else if (transitionEnCours == 0)
         {
-            print_grammar(grammaireEtTable.G);
             fprintf(stderr, "ATTENTION - Le mot \"%s\" n'est pas acceptable pour la grammaire suivante : \n",mot);
+            print_grammar(grammaireEtTable.G);
             free(flot);
             free(mot);
             free(pile);
@@ -78,8 +76,12 @@ int main(int argc, char const *argv[])
     printf("\t\taccept\n");
     printf("\narbre (bien paranthésé):\n");
     print_arbre(neoudsRencontresOrphelins[0]);
-    printf("\n\narbre (vertical):\n");
-    print_arbre_vertical(neoudsRencontresOrphelins[0],0);
+    if (strlen(mot)<20)
+    {
+        printf("\n\narbre (vertical):\n");
+        print_arbre_vertical(neoudsRencontresOrphelins[0],0);
+    }
+    
 
     // affichage de fin
     printf("\n##############################\n\tFin Algo SLR\n##############################\n");
