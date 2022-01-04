@@ -4,7 +4,7 @@ OPTS=-Wall -o1
 FOLDER=code
 MAIN=$(FOLDER)/client.c
 EXE=LRanalyzer
-DEPS=$(FOLDER)/LRGrammar.h $(FOLDER)/read_file.h $(FOLDER)/arbre.h $(FOLDER)/analyseurLR.h
+DEPS=$(FOLDER)/LRGrammar.h $(FOLDER)/read_file.h $(FOLDER)/arbre.h $(FOLDER)/analyseurLR.h $(FOLDER)/tools.h
 PRECOMP=$(DEPS:.h=.o)
 FILE_TEST=assets/toto
 WORD_TEST="aabb"
@@ -23,6 +23,7 @@ clean:
 
  # regle make pour tester avec un exemple simple
 test: $(PRECOMP)
+	clear
 	@$(CC) $(OPTS) $(MAIN) $(PRECOMP) -o $(EXE)
 	./$(EXE) $(FILE_TEST) $(WORD_TEST)
 

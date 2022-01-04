@@ -14,7 +14,7 @@ void print_arbre(noeud *racine){
     printf(")");
 };
 
-void print_arbre_pretty(noeud *racine,int indentation){
+void print_arbre_vertical(noeud *racine,int indentation){
     for (size_t i = 0; i < indentation; i++)
     {
         printf("   ");
@@ -34,7 +34,7 @@ void print_arbre_pretty(noeud *racine,int indentation){
     }
     for (size_t i = 0; i < racine->nbfils; i++)
     {
-        print_arbre_pretty(racine->fils[i],indentation + 1);
+        print_arbre_vertical(racine->fils[i],indentation + 1);
     }
 };
 

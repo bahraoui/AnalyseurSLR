@@ -2,107 +2,45 @@
 
 #include "arbre.h"
 #include "analyseurLR.h"
+#include "tools.h"
 
 int main(int argc, char const *argv[])
 {
-    /****************************
-     *
-     *  Verification du bon nombre d'arguments [Bon nombre = 2]
-     *
-     ****************************/
+    // Var. globales
+    tailleNeoudsRencontresOrphelins = 0;
+    // Var. locales
+    char *mot, *flot, *pile, neoudRecupere;
+    signed char transitionMotEnCours;
+    file_read grammaireEtTable;
+    size_t taillePile = 1;
 
-    if (argc < 3) // nombre d'arguments trop petit
-    {
-        fprintf(stderr, "erreur -- trop peu d'arguments (tableau SLR et mot a tester requis)\n");
-        printf("USAGE:  ./LRanalyzer [fichier] \"[mot]\"\n\
-        fichier:\t-fichier contenant grammaire et tableau SLR\n\
-        mot:\t\t-mot a tester sur la grammaire du fichier\n");
-        exit(EXIT_FAILURE);
-    }
-    else if (argc > 3) // nombre d'arguments trop grand
-    {
-        fprintf(stderr, "erreur -- trop d'arguments (tableau SLR et mot uniquement)\n");
-        printf("USAGE:  ./LRanalyzer [fichier] \"[mot]\"\n\
-        fichier:\t-fichier contenant grammaire et tableau SLR\n\
-        mot:\t\t-mot a tester sur la grammaire du fichier\n");
-        exit(EXIT_FAILURE);
-    }
 
-    /*##########################
-     *
-     * FIN de Verification du bon nombre d'arguments [Bon nombre = 2]
-     *
-    ##########################*/
+    // Verification du nombre d'arguments
+    verif_args(argc);
 
     // Verification du fichier en entree [Premier argument]
+    grammaireEtTable = verification_fichier(argv[1]);
 
-    char *fichier = (char *)malloc(strlen(argv[1]) + 1);
-    file_read grammaireEtTable;
-    strcpy(fichier, argv[1]);
+    // Lecture du mot en entree [Second Argument]
+    mot = verification_mot(argv[2]);
 
-    FILE *file = fopen(fichier, "r+");
-    printf("Lecture du fichier en cours ...\r");
-    if (file != NULL) // Fichier existant
-    {
-        printf("Lecture du fichier en cours ... \xE2\x9C\x94\n");
-        printf("Validation du fichier en cours ...\r");
-        grammaireEtTable = read_file(fichier);
-        printf("Validation du fichier en cours ... \xE2\x9C\x94\n");
-        fclose(file);
-    }
-    else // Fichier inexistant ou impossible d'acces
-    {
-        printf("Lecture du fichier en cours ... \xE2\x9D\x8C\n");
-        fprintf(stderr, "Impossible d'ouvrir le fichier %s\n", fichier);
-        exit(EXIT_FAILURE);
-    }
+    // affichage des valeurs donnees en entree et verifiees
+    printf("\nFichier : %s\nMot : %s\n", argv[1], mot);
 
-    /*##########################
-     *
-     * FIN de Verification du fichier
-     *
-    ##########################*/
-
-    // Lecture du mot en entree [Second Argument] :
-    printf("Lecture du mot en cours ...\r");
-    char *mot = (char *)calloc(strlen(argv[2]) + 1, sizeof(char));
-    strcpy(mot, argv[2]);
-    printf("Lecture du mot en cours ... \xE2\x9C\x94\n");
-
-    // affichage des valeurs donnees en entree et verifiees :
-    printf("\nFichier : %s\nMot : %s\n", fichier, mot);
-
-    /*##########################
-     *
-     * FIN de Verification du mot
-     *
-    ##########################*/
-
-    
-    /****************************
-     *
-     *  Debut d'algo
-     *
-     ****************************/
-    /**
-     * var. globales
-     */
-    neoudsRencontresOrphelins = (noeud **)malloc(strlen(mot) * 512 * sizeof(noeud *));
-    tailleNeoudsRencontresOrphelins = 0;
-    /**
-     * var. locales
-     */
-    char *flot = (char *)calloc(strlen(mot)+1, sizeof(char));
-    char *pile = (char *)calloc(strlen(mot) * 512, sizeof(char));
-    char neoudRecupere;
-    size_t taillePile = 1;
+    // initialisation des variables
+    flot = (char *)calloc(strlen(mot)+1, sizeof(char));
+    pile = (char *)calloc(strlen(mot) * 512, sizeof(char));
     pile[0] = '0';
     strcpy(flot, mot);
+    neoudsRencontresOrphelins = (noeud **)malloc(strlen(mot) * 512 * sizeof(noeud *));
+    transitionMotEnCours = grammaireEtTable.t.trans[flot[0]]; // 1 realisation avant de rentrer dans la boucle
+
+    // 1er affichage
     printf("\n\n##############################\n\tDebut Algo SLR\n##############################\n\n\
     \tFlot\t|    Pile\n----------------------------------------\n");
     printf("\t%s\t|    %s\n", flot, pile);
 
-    signed char transitionMotEnCours = grammaireEtTable.t.trans[256 * 0 + flot[0]]; // 1 realisation avant de rentrer dans la boucle
+
     while (transitionMotEnCours!=-127)
     {
         // recuperation du noeud pour la construction de l'arbre
@@ -113,38 +51,42 @@ int main(int argc, char const *argv[])
         // dans le cas d'un decalage
         if (transitionMotEnCours > 0)
         {
-            decalage(pile,flot,&taillePile,&transitionMotEnCours,grammaireEtTable.t,stdout);
+            decalage(pile, flot, &taillePile, &transitionMotEnCours, grammaireEtTable.t, stdout);
         }
         // dans le cas d'une reduction
         else if (transitionMotEnCours < 0)
         {
-            reduction(pile,flot,&taillePile,&transitionMotEnCours, grammaireEtTable, stdout);
+            reduction(pile, flot, &taillePile, &transitionMotEnCours, grammaireEtTable, stdout);
         }
         // dans le cas ou le flot n'est pas accepte (ex: "aa" avec S -> aSb|epsylon)
         else if (transitionMotEnCours == 0)
         {
-            fprintf(stderr, "ATTENTION - Le mot \"%s\" n'est pas acceptable pour la grammaire suivante : \n",mot);
             print_grammar(grammaireEtTable.G);
+            fprintf(stderr, "ATTENTION - Le mot \"%s\" n'est pas acceptable pour la grammaire suivante : \n",mot);
+            free(flot);
+            free(mot);
+            free(pile);
+            free(grammaireEtTable.G.rules);
+            free(grammaireEtTable.t.trans);
+            free_arbre(neoudsRencontresOrphelins[0]);
+            free(neoudsRencontresOrphelins);
             exit(EXIT_FAILURE);
         }
     }
+
+    // affichage de l'arbre
     printf("\t\taccept\n");
-    // print arbre
     printf("\narbre (bien paranthésé):\n");
     print_arbre(neoudsRencontresOrphelins[0]);
     printf("\n\narbre (vertical):\n");
-    print_arbre_pretty(neoudsRencontresOrphelins[0],0);
-    printf("\n\n##############################\n\tFin Algo SLR\n##############################\n\n");
+    print_arbre_vertical(neoudsRencontresOrphelins[0],0);
 
-    /*##########################
-     *
-     * Fin d'algo
-     *
-    ##########################*/
+    // affichage de fin
+    printf("\n##############################\n\tFin Algo SLR\n##############################\n");
     
+    // free toutes les allocations precedentes
     free(flot);
     free(mot);
-    free(fichier);
     free(pile);
     free(grammaireEtTable.G.rules);
     free(grammaireEtTable.t.trans);
