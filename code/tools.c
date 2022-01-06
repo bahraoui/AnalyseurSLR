@@ -65,6 +65,5 @@ void affichage_ligne(char* pile, char* flot, signed char transition, size_t tail
     {
         fprintf(stdout," ");
     }
-    fprintf(stdout,"%s", flot);
-    fprintf(stdout,"    |    %s\n", pile);
+    fprintf(stdout,"%s    |    %s\n",flot, pile);
 }

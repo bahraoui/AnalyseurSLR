@@ -66,9 +66,7 @@ int main(int argc, char const *argv[])
         {
             fprintf(stderr, "ATTENTION - Le mot \"%s\" n'est pas acceptable pour la grammaire suivante : \n",mot);
             print_grammar(grammaireEtTable.G);
-            free(flot);
-            free(mot);
-            free(pile);
+            free(flot); free(mot); free(pile);
             free(grammaireEtTable.G.rules);
             free(grammaireEtTable.t.trans);
             free_arbre(neoudsRencontresOrphelins[0]);
@@ -89,9 +87,7 @@ int main(int argc, char const *argv[])
     printf("\n##############################\n\tFin Algo SLR\n##############################\n");
     
     // free toutes les allocations precedentes
-    free(flot);
-    free(mot);
-    free(pile);
+    free(flot); free(mot); free(pile);
     free(grammaireEtTable.G.rules);
     free(grammaireEtTable.t.trans);
     free_arbre(neoudsRencontresOrphelins[0]);

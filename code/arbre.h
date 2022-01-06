@@ -55,11 +55,14 @@ void free_arbre(noeud *racine);
 char recuperer_node(char caractereLu, char transition, grammar parGrammar);
 
 /**
- * @brief construit l'arbre
+ * @brief construit l'arbre.
+ *  si l'iteration de la boucle est un decalage, une feuille est cree et ajoute dans la liste des noeuds rencontrees.
+ *  si l'iteration de la boucle est une reduction, un noeud est cree avec en fils les derniers neouds de la liste des noeuds rencontrees
+ *  et modification de la liste.
  * 
- * @param nodeRecup 
- * @param transition 
- * @param parGrammar 
+ * @param nodeRecup la valeur du neoud a creer
+ * @param transition transition en cours
+ * @param parGrammar la grammaire donnee en entree
  */
 void construire_arbre(char nodeRecup, signed char transition, grammar parGrammar);
 
