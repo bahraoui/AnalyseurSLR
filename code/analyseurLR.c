@@ -1,3 +1,5 @@
+/* Authors: GUENDOUZ Reda, BAHRAOUI Marwane, 2021-2022 */
+
 #include "analyseurLR.h"
 
 void decalage(char* pile, char*flot, size_t* taillePile, signed char *transition, table tableau){

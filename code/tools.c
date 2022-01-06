@@ -1,3 +1,5 @@
+/* Authors: GUENDOUZ Reda, BAHRAOUI Marwane, 2021-2022 */
+
 #include "tools.h"
 
 void verif_args(int argc){
