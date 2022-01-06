@@ -87,6 +87,7 @@ void construire_arbre(char nodeRecup, signed char transition, grammar parGrammar
         nonTerminal->nbfils = 0;
 
         int nbRightElement = strlen((const char*)parGrammar.rules[-transition - 1].rhs);
+        nonTerminal->fils = (noeud**)malloc((nbRightElement+1)*sizeof(noeud**));
         for (size_t i = nbRightElement; i != 0; i--)
         {
             nonTerminal->fils[nonTerminal->nbfils] = neoudsRencontresOrphelins[tailleNeoudsRencontresOrphelins-i];

@@ -6,10 +6,14 @@
 #include "LRGrammar.h"
 #include "read_file.h"
 
+/**
+ * @brief Représentation d'un arbre
+ * 
+ */
 typedef struct noeud
 {
-    struct noeud* fils[100];
-    char value;
+    struct noeud** fils;
+    unsigned char value;
     int nbfils;
 }noeud;
 
