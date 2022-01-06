@@ -51,14 +51,14 @@ int main(int argc, char const *argv[])
         if (transitionEnCours > 0)
         {
             transitionPrecedenteAffichage = transitionEnCours;
-            decalage(pile, flot, &taillePile, &transitionEnCours, grammaireEtTable.t, stdout);
+            decalage(pile, flot, &taillePile, &transitionEnCours, grammaireEtTable.t);
             affichage_ligne(pile,flot,transitionPrecedenteAffichage,tailleMot);
         }
         // dans le cas d'une reduction
         else if (transitionEnCours < 0)
         {
             transitionPrecedenteAffichage = transitionEnCours;
-            reduction(pile, flot, &taillePile, &transitionEnCours, grammaireEtTable, stdout);
+            reduction(pile, flot, &taillePile, &transitionEnCours, grammaireEtTable);
             affichage_ligne(pile,flot,transitionPrecedenteAffichage,tailleMot);
         }
         // dans le cas ou le flot n'est pas accepte (ex: "aa" avec S -> aSb|epsylon)

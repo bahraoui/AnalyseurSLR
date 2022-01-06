@@ -1,6 +1,6 @@
 #include "analyseurLR.h"
 
-void decalage(char* pile, char*flot, size_t* taillePile, signed char *transition, table tableau, FILE* output){
+void decalage(char* pile, char*flot, size_t* taillePile, signed char *transition, table tableau){
     sprintf(&pile[(*taillePile)], "%c%d", flot[0], (*transition));
     if ((*transition) < 10)
     {
@@ -17,7 +17,7 @@ void decalage(char* pile, char*flot, size_t* taillePile, signed char *transition
     (*transition) = tableau.trans[256 * (*transition) + flot[0]];
 }
 
-void reduction(char* pile, char*flot, size_t* taillePile, signed char *transition, file_read grammaireEtTable, FILE* output){
+void reduction(char* pile, char*flot, size_t* taillePile, signed char *transition, file_read grammaireEtTable){
     size_t tailleRegle = strlen((const char*)grammaireEtTable.G.rules[-(*transition) - 1].rhs);
     size_t indexRegle = (*taillePile) - 1, indexNbTransition;
     size_t tmp = 0;
