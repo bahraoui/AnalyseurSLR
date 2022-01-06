@@ -10,9 +10,9 @@ int main(int argc, char const *argv[])
     tailleNeoudsRencontresOrphelins = 0;
     // Var. locales
     char *mot, *flot, *pile, neoudRecupere;
-    signed char transitionEnCours;
+    signed char transitionEnCours, transitionPrecedenteAffichage;
     file_read grammaireEtTable;
-    size_t taillePile = 1;
+    size_t taillePile = 1, tailleMot;
 
     // Verification du nombre d'arguments
     verif_args(argc);
@@ -22,6 +22,7 @@ int main(int argc, char const *argv[])
 
     // Lecture du mot en entree [Second Argument]
     mot = verification_mot(argv[2]);
+    tailleMot = strlen(mot);
 
     // affichage des valeurs donnees en entree et verifiees
     printf("\nFichier : %s\nMot : %s\n", argv[1], mot);
@@ -37,7 +38,7 @@ int main(int argc, char const *argv[])
     // 1er affichage
     printf("\n\n##############################\n\tDebut Algo SLR\n##############################\n\n\
     \tFlot\t|    Pile\n----------------------------------------\n");
-    printf("\t%s\t|    %s\n", flot, pile);
+    printf("\t%s    |    %s\n", flot, pile);
 
     while (transitionEnCours!=-127)
     {
@@ -49,12 +50,16 @@ int main(int argc, char const *argv[])
         // dans le cas d'un decalage
         if (transitionEnCours > 0)
         {
+            transitionPrecedenteAffichage = transitionEnCours;
             decalage(pile, flot, &taillePile, &transitionEnCours, grammaireEtTable.t, stdout);
+            affichage_ligne(pile,flot,transitionPrecedenteAffichage,tailleMot);
         }
         // dans le cas d'une reduction
         else if (transitionEnCours < 0)
         {
+            transitionPrecedenteAffichage = transitionEnCours;
             reduction(pile, flot, &taillePile, &transitionEnCours, grammaireEtTable, stdout);
+            affichage_ligne(pile,flot,transitionPrecedenteAffichage,tailleMot);
         }
         // dans le cas ou le flot n'est pas accepte (ex: "aa" avec S -> aSb|epsylon)
         else if (transitionEnCours == 0)

@@ -51,3 +51,26 @@ char* verification_mot(char const *argv2){
     printf("Lecture du mot en cours ... \xE2\x9C\x94\n");
     return mot;
 }
+
+void affichage_ligne(char* pile, char* flot, signed char transition, size_t tailleMot){
+    if (transition>0)
+    {
+        fprintf(stdout,"d%d\t%s", transition, flot);
+        unsigned char limite = tailleMot - strlen(flot);
+        for (size_t i = 0; i != 4+limite; i++)
+        {
+            fprintf(stdout," ");
+        }
+        
+        fprintf(stdout,"|    %s\n", pile);
+    } else
+    {
+        fprintf(stdout,"r%d\t%s", -transition, flot);
+        unsigned char limite = tailleMot - strlen(flot);
+        for (size_t i = 0; i != 4 + limite; i++)
+        {
+            fprintf(stdout," ");
+        }
+        fprintf(stdout,"|    %s\n", pile);
+    }
+}

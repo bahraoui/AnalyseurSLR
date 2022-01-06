@@ -14,13 +14,10 @@ void decalage(char* pile, char*flot, size_t* taillePile, signed char *transition
     {
         memmove(flot, flot + 1, strlen(flot)); // enleve le 1er caracatere de flot
     }
-    fprintf(output,"d%d\t%s\t|    ", (*transition), flot);
-    fprintf(output,"%s\n", pile);
     (*transition) = tableau.trans[256 * (*transition) + flot[0]];
 }
 
 void reduction(char* pile, char*flot, size_t* taillePile, signed char *transition, file_read grammaireEtTable, FILE* output){
-    fprintf(output,"r%d\t%s\t|    ", -(*transition), flot);
     size_t tailleRegle = strlen((const char*)grammaireEtTable.G.rules[-(*transition) - 1].rhs);
     size_t indexRegle = (*taillePile) - 1, indexNbTransition;
     size_t tmp = 0;
@@ -45,6 +42,5 @@ void reduction(char* pile, char*flot, size_t* taillePile, signed char *transitio
     sprintf(&pile[indexRegle+1], "%c%d", grammaireEtTable.G.rules[-(*transition) - 1].lhs, grammaireEtTable.t.trans[256 * ((tmp) + 1) - grammaireEtTable.G.rules[-(*transition) - 1].lhs]);
     (*taillePile) = indexRegle+2;
     tmp=grammaireEtTable.t.trans[256 * (tmp + 1) - grammaireEtTable.G.rules[-(*transition) - 1].lhs];
-    fprintf(output,"%s\n", pile);
     (*transition) = grammaireEtTable.t.trans[256 * (tmp) + flot[0]];
 }
