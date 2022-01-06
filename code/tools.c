@@ -56,14 +56,15 @@ void affichage_ligne(char* pile, char* flot, signed char transition, size_t tail
     unsigned char limite = tailleMot - strlen(flot);
     if (transition>0)
     {
-        fprintf(stdout,"d%d\t%s", transition, flot);
+        fprintf(stdout,"d%d\t", transition);
     } else
     {
-        fprintf(stdout,"r%d\t%s", -transition, flot);
+        fprintf(stdout,"r%d\t", -transition);
     }
-    for (size_t i = 0; i != 4+limite; i++)
+    for (size_t i = 0; i != limite; i++)
     {
         fprintf(stdout," ");
     }
-    fprintf(stdout,"|    %s\n", pile);
+    fprintf(stdout,"%s", flot);
+    fprintf(stdout,"    |    %s\n", pile);
 }
