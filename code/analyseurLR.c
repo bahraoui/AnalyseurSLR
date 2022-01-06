@@ -38,7 +38,7 @@ void reduction(char* pile, char*flot, size_t* taillePile, signed char *transitio
             indexNbTransition--;
         }
     }
-    sscanf(&pile[indexNbTransition],"%hhd",&tmp);
+    sscanf(&pile[indexNbTransition],"%ld",&tmp);
     sprintf(&pile[indexRegle+1], "%c%d", grammaireEtTable.G.rules[-(*transition) - 1].lhs, grammaireEtTable.t.trans[256 * ((tmp) + 1) - grammaireEtTable.G.rules[-(*transition) - 1].lhs]);
     (*taillePile) = indexRegle+2;
     tmp=grammaireEtTable.t.trans[256 * (tmp + 1) - grammaireEtTable.G.rules[-(*transition) - 1].lhs];
