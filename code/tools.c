@@ -53,24 +53,17 @@ char* verification_mot(char const *argv2){
 }
 
 void affichage_ligne(char* pile, char* flot, signed char transition, size_t tailleMot){
+    unsigned char limite = tailleMot - strlen(flot);
     if (transition>0)
     {
         fprintf(stdout,"d%d\t%s", transition, flot);
-        unsigned char limite = tailleMot - strlen(flot);
-        for (size_t i = 0; i != 4+limite; i++)
-        {
-            fprintf(stdout," ");
-        }
-        
-        fprintf(stdout,"|    %s\n", pile);
     } else
     {
         fprintf(stdout,"r%d\t%s", -transition, flot);
-        unsigned char limite = tailleMot - strlen(flot);
-        for (size_t i = 0; i != 4 + limite; i++)
-        {
-            fprintf(stdout," ");
-        }
-        fprintf(stdout,"|    %s\n", pile);
     }
+    for (size_t i = 0; i != 4+limite; i++)
+    {
+        fprintf(stdout," ");
+    }
+    fprintf(stdout,"|    %s\n", pile);
 }
