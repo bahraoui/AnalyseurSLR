@@ -81,11 +81,8 @@ int main(int argc, char const *argv[])
     printf("\t\taccept\n");
     printf("\narbre (bien paranthésé):\n");
     print_arbre(neoudsRencontresOrphelins[0]);
-    if (strlen(mot)<20)
-    {
-        printf("\n\narbre (vertical):\n");
-        print_arbre_vertical(neoudsRencontresOrphelins[0],0);
-    }
+    printf("\n\narbre (vertical):\n");
+    print_arbre_vertical(neoudsRencontresOrphelins[0],0);
     
 
     // affichage de fin
